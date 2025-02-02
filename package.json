@@ -1,0 +1,26 @@
+{
+  "name": "ccreature",
+  "version": "1.0.0",
+  "description": "scifi roguelite deckbuilder",
+  "source": "src/index.html",
+  "scripts": {
+    "dev": "parcel src/index.html",
+    "dev-no-hmr": "parcel src/index.html --no-hmr",
+    "build": "parcel build src/index.html --no-source-maps",
+    "build-sm": "parcel build src/index.html",
+    "clean": "rm dist/*",
+    "serve": "serve -l 1234 dist/",
+    "test": "echo \"lmao you thought\" && exit 1"
+  },
+  "author": "Chris Szentkiralyi",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.22.5",
+    "@parcel/babel-preset-env": "^2.9.2",
+    "@parcel/packager-raw-url": "^2.9.2",
+    "@parcel/transformer-webmanifest": "^2.9.2",
+    "mithril": "^2.2.2",
+    "parcel": "^2.9.2",
+    "serve": "^14.2.0"
+  }
+}
