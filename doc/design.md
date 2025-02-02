@@ -17,7 +17,7 @@ A roguelite deckbuilder featuring ARPG affixes on cards.
 
 ### 1.2 Differences
 
-- Cards are not fixed
+- Cards are not fixed, they start from bases
 - Rewards are common and frequent, curated by loot filters
 
 2 Gameplay loop
@@ -137,6 +137,18 @@ Gear would provide:
 - Attributes
 - Percentage boosts
 
+#### 3.1.6 Levels & XP
+
+Possible idea: leveling up grants life, base attributes, and widens the
+deckbuilding window. By default, the player's class determines their base
+life and attributes (and starting deck), but all level 1 characters have
+the same deck restrictions of requiring a number of cards in some range
+(e.g. no fewer than 10, no more than 12).
+
+Encounters award XP and after a few encounter sequences, the player levels
+up which grants some additional base life and attributes, and allows them
+to include fewer or more cards than before (e.g. 10-12 -> 10-15 -> 8-15).
+
 ### 3.2 Affixes
 
 Affixes essentially mimic ARPG affixes:
@@ -152,6 +164,8 @@ capture the purpose of that section of an affix...
      target, I guess)
   3. "Autoplay" is an action on its own
   4. "Speed 2" is the "speed" action with magnitude 2
+  5. "20% increased Dark Attack" is the "attack" action, magnitude 20, 
+     target "dark," and effect "increased" (additive percentage)
 - Affixes are categorized, tiered, and exclusive (but to what degree?)
   - Not all affix groups will have the same amount of tiers
   - Each individual affix (a tier within a group) has a unique name, which is
@@ -190,3 +204,11 @@ At no point does anybody give a shit.
 - Speed: "The autotoxicology limitation progression is absurd, but if it's working
   for you then keep it up. We've got a pool going on how long supersaturation can
   be maintained and this might settle it."
+
+#### 3.3.2 Opening flavor
+
+IT IS THE FAR FUTURE. HUMANITY HAS COLONIZED THE GALAXY AND FOUND NO OTHER LIFE.
+THERE IS NO WONDER, THERE IS NO PROGRESS, THERE IS ONLY APATHY AND BOREDOM ACROSS
+INFINITE SOLAR SYSTEMS.
+
+YOU ARE CCREATURE, A GENETIC MANIPULATION EXPERIMENT. GO FORTH AND CONSUME.

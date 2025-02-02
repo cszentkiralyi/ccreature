@@ -1,50 +1,42 @@
-import { Constants } from './constants.js';
+import Constants from './constants.js';
+import Util from './util.js';
+import { Affix, AFFIXES } from './affix.jsx';
+import AffixGen from '../data/affixes.js';
 
 const AP = Constants.AFFIX_POSITION;
-
-class Affix {
-  titles;
-  position;
-  action;
-  magnitude;
-  target;
-
-  constructor(position, titles, { action, magnitude, target }) {
-    this.position = position;
-    this.titles = titles;
-    this.action = action;
-    this.magnitude = magnitude;
-    this.target = target;
-  }
-
-}
-
-const AFFIXES = {
-  attack: [
-    new Affix(AP.PREFIX, ['Warrior\'s', 'Strike' ], { action: 'attack', magnitude: 10 })
-  ]
-};
-
+const R = Constants.RARITY
 
 class Card {
   static AFFIX_LIMIT = 4;
 
-  _affixes;
+  affixes;
+  rarity;
 
-  constructor({ affixes }) {
-    this._affixes = affixes || [];
+  constructor({ rarity, ...opts }) {
+    this.rarity = rarity;
+    this.affixes = (opts && opts.affixes) || [];
   }
 
+  get affixes() { return [...this.affixes]; }
+
   addAffix(affix) {
-    if (this._affixes.length === Card.AFFIX_LIMIT) return false;
-    this._affixes = this._affixes.append(affix);
+    if (this.affixes.length === Card.AFFIX_LIMIT) return false;
+    this.affixes.push(affix);
     return true;
   }
 
   removeAffix(x) {
+    let affixes = this.affixes;
+    let next = affixes;
     if (typeof x === 'string') {
-      this._affixes = this._affixes.filter(a => a.label === x);
-      return true;
+      next = affixes.filter(a => a.label !== x);
+    } else if (x instanceof Affix) {
+      next = affixes.filter(a => a !== x);
+    }
+
+    if (next !== affixes) {
+      this.affixes = next;
+      return true
     }
 
     return false;
@@ -52,8 +44,7 @@ class Card {
 
   get title() {
     let [prefixes, suffixes] =
-      this._affixes.reduce(([p, s], a) => {
-        console.log([p, s]);
+      this.affixes.reduce(([p, s], a) => {
         if (a.position === AP.PREFIX) {
           p = p.concat([a]);
         } else {
@@ -61,8 +52,8 @@ class Card {
         }
         return [p, s];
       }, [[],[]]);
-    prefixes = prefixes.sort((a, b) => Card.sortAffix(this._affixes, a, b));
-    suffixes = suffixes.sort((a, b) => Card.sortAffix(this._affixes, a, b));
+    prefixes = prefixes.sort((a, b) => Card.sortAffix(this.affixes, a, b));
+    suffixes = suffixes.sort((a, b) => Card.sortAffix(this.affixes, a, b));
 
     /*
          P: Strike
@@ -73,11 +64,16 @@ class Card {
     */
 
     let t = '';
-    console.log(prefixes, suffixes, this._affixes);
     if (prefixes.length == 2) t = prefixes[1].titles[0] + ' ';
-    t += prefixes[0].titles[1];
-    t += ' ' + suffixes.map((s, i) => s.titles[i]).join(' ');
-    return t;
+    if (prefixes.length > 0) {
+      t += prefixes[0].titles[1];
+      t += ' ' + suffixes.map((s, i) => s.titles[i]).join(' ');
+    } else if (suffixes.length == 1) {
+      t += suffixes[0].titles[1];
+    } else {
+      t += suffixes.map((s, i) => s.titles[i]).join(' ')
+    }
+    return t.trim();
   }
 
   static sortAffix(affixes, a, b) {
@@ -88,6 +84,36 @@ class Card {
     } else {
       return -1;
     }
+  }
+
+  static generate() {
+    let rarity = Util.wrng([
+      { value: R.COMMON, weight: 100 },
+      { value: R.MAGIC, weight: 50 },
+      { value: R.RARE, weight: 10 }
+    ]).value;
+
+    let affixCount = 1; // Common
+    switch (rarity) {
+      case R.MAGIC:
+        affixCount = Util.wrng([{ value: 1, weight: 2 }, { value: 2, weight: 1 }]).value;
+        break;
+      case R.RARE:
+        affixCount = Util.wrng([
+          { value: 2, weight: 7 },
+          { value: 3, weight: 5 },
+          { value: 4, weight: 2 }
+        ]).value;
+        break;
+    }
+
+    let card = new Card({ rarity: rarity }), i;
+    for (i = 0; i < affixCount; i++) {
+      let affixData = AffixGen.generateAffixExcluding({ inst: card.affixes });
+      let affix = new Affix(affixData.position, affixData.titles, affixData.spec);
+      card.addAffix(affix);
+    }
+    return card;
   }
 }
 
