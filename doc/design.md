@@ -158,6 +158,7 @@ capture the purpose of that section of an affix...
     used to rename/update cards -- but this **must** be predictable and repeatable
     to avoid confusion, two cards with identical affixes must generate identical
     names
+- All cards begin life as a prefix
 
 ### 3.3 Setting/theme
 
