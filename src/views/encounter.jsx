@@ -1,6 +1,7 @@
 import m from 'mithril';
 
 import Util from '../lib/util.js';
+import Constants from '../lib/constants.js';
 
 import Card from './card.jsx';
 
@@ -20,10 +21,13 @@ class EncounterScreen {
         <div class="cursor-pointer">
           <EncounterCardPile count={encounter.entities['player'].deck.count('discard')} />
         </div>
-        <div class="">Play area</div>
+        <div class="">
+          <div>Play area</div>
+          <div><code>{Constants.ENCOUNTER_STATE.byVal[encounter.state]}</code></div>
+          </div>
         <div class="cursor-pointer">
           <EncounterCardPile count={encounter.entities['player'].deck.count('draw')}
-            onclick={() => encounter.entities['player'].drawCard()}
+            onclick={() => encounter.gameEvent('player-deck-click')}
           />
         </div>
 
@@ -31,7 +35,7 @@ class EncounterScreen {
         <div class="">
           <EncounterHand
             hand={encounter.entities['player'].hand}
-            ondiscard={(card) => encounter.entities['player'].discardCard(card)}
+            onselect={(card) => encounter.gameEvent('player-play-card', { card })}
              />
             </div>
         <div class="">Mana pool</div>
@@ -44,6 +48,7 @@ class EncounterHand {
   static ROTATION = { MIN: -8, MAX: 8, CARDS: 12 };
   static CARD_RAISE_REM = 1;
   hovering = null;
+  selected = null;
 
   view({ attrs }) {
     // Horizontal layout
@@ -81,7 +86,17 @@ class EncounterHand {
       <div class="relative"
         style={{ height: `calc(${Card.HEIGHT} + 0.5rem)` }}>
         {attrs.hand.map((card, i) => {
-          let hov = this.hovered == i;
+          let sel = this.selected == i;
+          let hov = sel || (this.hovered == i && this.selected == null);
+          let onclick;
+          if (sel) {
+            onclick = () => { this.selected = null; attrs.onselect(card) };
+          } else if (this.selected != null) {
+            onclick = () => this.selected = null;
+          } else {
+            onclick = () => this.selected = i;
+          }
+
           return (<div class="absolute"
             style={{
               height: Card.HEIGHT,
@@ -95,7 +110,7 @@ class EncounterHand {
               transform: `rotate(${rotation(i)}deg)`
             }}>
             <Card card={card}
-             onclick={() => attrs.ondiscard(card)}
+             onclick={onclick}
              onhoverstart={() => this.hovered = i}
              onhoverend={() => this.hovered = null} />
           </div>)

@@ -3,6 +3,12 @@ import Util from './util.js';
 
 const ES = Constants.ENCOUNTER_STATE;
 
+class GameEventHandler {
+  state;
+  nextState() { }
+  gameEvent(event, args, redraw) { redraw(); }
+}
+
 class EncounterDeck {
   _cards;
   _draw;
@@ -90,36 +96,62 @@ class EncounterEntity {
   }
 }
 
-class Encounter {
+class Encounter extends GameEventHandler {
   entities;
-  _state;
 
   constructor({ playerCards }) {
+    super();
     this.entities = {
       'player': new EncounterEntity({ cards: playerCards || [], resources: { life: [10, 10] }}),
       'enemy': new EncounterEntity({ cards: [], resources: { life: [10, 10] }}),
     }
 
-    this._state = ES.BEGIN;
+    this.state = ES.BEGIN;
 
     for (var i = 0; i < 3; i++) {
       this.entities.player.drawCard();
     }
 
-    this._state = ES.PLAYER_PLAY;
+    this.state = ES.PLAYER_PLAY;
   }
 
-  nextPhase() {
+  nextState() {
     let next = null;
     if (this.entities.player.life == 0 || this.entities.enemy.life == 0) {
-      next = (this.entities.player.mana == 0) ? EP.PLAYER_WIN : EP.PLAYER_LOSE;
+      next = (this.entities.player.mana == 0) ? ES.PLAYER_WIN : ES.PLAYER_LOSE;
     } else {
-      switch (this._state) {
-        case EP.PLAYER_PLAY:
-          next = EP.PLAYER_DRAW;
+      switch (this.state) {
+        case ES.PLAYER_PLAY:
+          next = ES.PLAYER_DRAW;
+          break;
+        case ES.PLAYER_DRAW:
+          next = ES.PLAYER_PLAY;
+          break;
       }
     }
-    if (this._state !== next && next != null) this._state = next;
+    if (this.state !== next && next != null) this.state = next;
+  }
+
+  gameEvent(event, args, redraw) {
+    console.log(event, args);
+    switch (event) {
+      case 'player-deck-click':
+        if (this.state == ES.PLAYER_DRAW) {
+          this.entities.player.drawCard()
+          this.nextState();
+        }
+        break;
+      case 'player-play-card':
+        if (this.state == ES.PLAYER_PLAY) {
+          this.entities.player.discardCard(args.card);
+          this.handleCard(args.card);
+          this.nextState();
+        }
+        break;
+    }
+  }
+
+  handleCard(card) {
   }
 }
 
