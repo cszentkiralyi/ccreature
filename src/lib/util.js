@@ -47,6 +47,9 @@ const wrng = (opts) => {
   }
 };
 
+/* Interpolates the range [a, b] to the point t in [0, 1] */
+const interp = (a, b, t) => a + (t * (b - a));
+
 const identity = (x) => x;
 
 const groupBy = (coll, f) => {
@@ -65,6 +68,7 @@ export default {
   clamp,
   rng,
   wrng,
+  interp,
   identity,
-  groupBy
+  groupBy,
  };

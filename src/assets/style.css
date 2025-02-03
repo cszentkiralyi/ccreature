@@ -109,6 +109,7 @@ body {
 .left-0 { left: 0; }
 .bottom-0 { bottom: 0; }
 .right-0 { right: 0; }
+.inset-0 { top: 0; bottom: 0; right: 0; left: 0; }
 .inset-y-0 { bottom: 0; top: 0;  }
 .inset-x-0 { right: 0; left: 0; }
 
@@ -131,6 +132,7 @@ body {
 .text-right { text-align: right; }
 
 .nowrap { white-space: nowrap; }
+.noselect { user-select: none; }
 
 .underline { text-decoration: underline; }
 .underline-dotted { text-decoration-style: dotted; }
@@ -146,6 +148,7 @@ body {
 .pointer-events-none { pointer-events: none; }
 .pointer-events-auto { pointer-events: auto; }
 
+.cursor-default { cursor: default; }
 .cursor-pointer { cursor: pointer; }
 
 
@@ -184,11 +187,25 @@ body {
 .opacity-60 { opacity: 0.60; }
 .opacity-80 { opacity: 0.80; }
 .opacity-100 { opacity: 1; }
+.hover\:opacity-100:hover { opacity: 1; }
+
+
+.transition\:opacity { transition-property: opacity; transition-duration: 0.15s; }
 
 /* Colors/themes
  *
  * The closer to 0 a number is, the further "back" it represents from a visual perspective.
  * The same class applies the same kind of color, regardless of active theme. */
+.text-white {
+  color: white;
+}
+
+.bg-black {
+  background-color: rgba(0, 0, 0, var(--background-opacity));
+}
+.bg-white {
+  background-color: rgba(255, 255, 255, var(--background-opacity));
+}
 .bg-0 {
   background-color: #eee;
 }
@@ -196,8 +213,17 @@ body {
   background-color: #fff;
 }
 
-.bg-black {
-  background-color: rgba(0, 0, 0, var(--background-opacity));
+.bg-card-back {
+  background-color: #888;
+}
+.bg-common {
+  background-color: rgba(102, 102, 102, var(--background-opacity)); /* #666 */
+}
+.bg-magic {
+  background-color: rgba(51, 51, 170, var(--background-opacity)); /* #339 */
+}
+.bg-rare {
+  background-color: rgba(153, 153, 51, var(--background-opacity)); /* #993 */
 }
 
 .bg-opacity-0 { --background-opacity: 0; }
@@ -219,4 +245,17 @@ body {
 }
 .border-color-50 {
   border-color: #f00;
+}
+
+.border-color-card {
+  border-color: #666;
+}
+.border-color-common {
+  border-color: #666;
+}
+.border-color-magic {
+  border-color: #33A;
+}
+.border-color-rare {
+  border-color: #993;
 }

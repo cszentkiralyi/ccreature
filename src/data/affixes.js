@@ -14,6 +14,20 @@ const ALL_AFFIXES = [
     weight: 100,
     group: 'offense'
   },
+  {
+    position: AP.PREFIX,
+    titles: ['Thief\'s', 'Shock'],
+    spec: { action: AA.ATTACK, magnitude: 10, data: { damage: DMG.ELEMENTAL } },
+    weight: 100,
+    group: 'offense'
+  },
+  {
+    position: AP.PREFIX,
+    titles: ['Adept\'s', 'Mistake'],
+    spec: { action: AA.ATTACK, magnitude: 10, data: { damage: DMG.DARK } },
+    weight: 100,
+    group: 'offense'
+  },
 
   {
     position: AP.PREFIX,

@@ -90,7 +90,7 @@ class Card {
     let rarity = Util.wrng([
       { value: R.COMMON, weight: 100 },
       { value: R.MAGIC, weight: 50 },
-      { value: R.RARE, weight: 10 }
+      { value: R.RARE, weight: 15 }
     ]).value;
 
     let affixCount = 1; // Common
