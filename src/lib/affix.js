@@ -2,7 +2,6 @@ import Constants from './constants.js';
 import Util from './util.js';
 
 const AA = Constants.AFFIX_ACTION;
-const AP = Constants.AFFIX_POSITION;
 const DMG = Constants.DAMAGE_TYPE;
 const RES = Constants.RESOURCE;
 
@@ -62,34 +61,6 @@ class Affix {
     return null;
   }
 
-}
-
-const AFFIXES = {
-  attack: [
-    new Affix(AP.PREFIX,
-      ['Trainee\'s', 'Blow'],
-      { action: AA.ATTACK, magnitude: 5, data: { damage: DMG.PHYSICAL } }),
-    new Affix(AP.PREFIX,
-      ['Warrior\'s', 'Strike'],
-      { action: AA.ATTACK, magnitude: 10, data: { damage: DMG.PHYSICAL } }),
-    new Affix(AP.PREFIX,
-      ['Mercenary\'s', 'Cut'],
-      { action: AA.ATTACK, magnitude: 16, data: { damage: DMG.PHYSICAL } }),
-    new Affix(AP.PREFIX,
-      ['Soldier\'s', 'Crush'],
-      { action: AA.ATTACK, magnitude: 25, data: { damage: DMG.PHYSICAL } }),
-  ],
-  autoplay: [
-    new Affix(AP.PREFIX,
-      ['Instant', 'Imperative'],
-      { action: AA.AUTOPLAY }
-    )
-  ],
-  restore: [
-    new Affix(AP.PREFIX,
-      ['Healer\'s', 'Heal'],
-      { action: AA.RESTORE, magnitude: 10, data: { resource: RES.LIFE }}),
-  ]
 }
 
 export default Affix;

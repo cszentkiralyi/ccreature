@@ -5,23 +5,22 @@ const captialize = (s) => {
   return `${s.slice(0, 1).toUpperCase()}${s.slice(1, s.length).toLowerCase()}`;
 };
 
-const fromEnum = (e, v) => {
-  return Object.keys()[v];
-}
-
+/** Returns an array of elements of els in a random order */
 const shuffle = (els) => {
   return els.map(e => ({ e: e, s: Math.random() }))
     .sort((a, b) => a.s - b.s)
     .map(e => e.e);
 }
 
+/** Clamp v within the range [top, bot] */ 
 const clamp = (v, bot, top) => (v > top) 
   ? top 
   : (v < bot)
     ? bot
     : v;
 
-/* rng(n) rolls a fair n-sided die
+/** rng(n) rolls a fair n-sided die
+ * 
  * rng(n, m) rolls fairly in the range [n, m]
  */
 const rng = (n, m) => {
@@ -33,7 +32,8 @@ const rng = (n, m) => {
   }
 } 
 
-/* opts : [{ weight: N }, ...]
+/** opts : [{ weight: N }, ...]
+ * 
  * Returns one opt, chosen at random based on weight; other properties
  * of opt are preserved so attach values etc as needed */
 const wrng = (opts) => {
@@ -47,7 +47,7 @@ const wrng = (opts) => {
   }
 };
 
-/* Interpolates the range [a, b] to the point t in [0, 1] */
+/** Interpolates the range [a, b] to the point t in [0, 1] */
 const interp = (a, b, t) => a + (t * (b - a));
 
 const identity = (x) => x;
@@ -63,7 +63,6 @@ const groupBy = (coll, f) => {
 
 export default {
   captialize,
-  fromEnum,
   shuffle,
   clamp,
   rng,

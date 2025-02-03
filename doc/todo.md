@@ -24,19 +24,27 @@
 - [ ] Encounter UI
   - [ ] Rendering
     - [x] Card
-    - [ ] Deck
+    - [x] Deck
     - [x] Hand
-    - [ ] Discard pile
+    - [x] Discard pile
     - [ ] Play area
     - [ ] Resource globes
-  - [ ] Actions
+  - [x] Actions
     - [x] Draw card
     - [x] Discard card
-    - [ ] Play card
-    - [ ] Gain/lose resources
+    - [x] Play card
+    - [x] Gain/lose resources
+  - [ ] Enemy
+    - [ ] Archetype
+    - [ ] Draw & play
+- [ ] Game start
+  - [ ] New game screen
+  - [ ] Navigation menu
+    - [ ] Play (encounter)
+    - [ ] Collection
 
 ## Priority 2
 
 - [ ] Card generation
   - [ ] Basic affix tiering
-  - [ ] Weighted RNG algorithm
+  - [x] Weighted RNG algorithm
