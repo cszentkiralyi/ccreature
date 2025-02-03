@@ -75,7 +75,7 @@ export default {
      * - inst for exact object equality (to exclude specific records by ref)
      */
     // TODO: optimize for filt having just one key
-    let preds = [], pred;
+    let preds = [], pred, k;
     for (k in filt) {
       let vs = filt[k], pred;
       if (vs.length > 0) {

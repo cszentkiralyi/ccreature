@@ -41,7 +41,7 @@ const wrng = (opts) => {
   let roll = Math.floor(Math.random() * totalWeight);
   let sum = 0, i;
   for (i in opts.sort((a, b) => a.weight - b.weight)) {
-    o = opts[i];
+    let o = opts[i];
     sum += o.weight;
     if (roll < sum) return o;
   }
