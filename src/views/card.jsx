@@ -20,6 +20,7 @@ class Card {
       <div class="grid rounded bg-white border border-color-card shadow cursor-default noselect"
         style={{
           gridTemplateRows: '15% 1fr 1rem',
+          borderWidth: '2px',
           height: attrs.height || Card.HEIGHT,
           width: attrs.width || Card.WIDTH
         }}
@@ -43,7 +44,7 @@ class Card {
 
   view_facedown({ attrs }) {
     return (
-      <div class="rounded bg-card-back border border-color-1 shadow cursor-default noselect"
+      <div class="rounded bg-card-back border border-color-card shadow cursor-default noselect"
         style={{
           height: attrs.height || Card.HEIGHT,
           width: attrs.width || Card.WIDTH

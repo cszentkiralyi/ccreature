@@ -41,7 +41,7 @@ class EncounterScreen {
 }
 
 class EncounterHand {
-  static ROTATION = { MIN: -7, MAX: 7, CARDS: 12 };
+  static ROTATION = { MIN: -8, MAX: 8, CARDS: 12 };
   static CARD_RAISE_REM = 1;
   hovering = null;
 
@@ -70,17 +70,17 @@ class EncounterHand {
 
     let cardTop;
     {
-      let factor = Util.clamp(attrs.hand.length / EncounterHand.ROTATION.CARDS, 0, 1);
+      let factor = attrs.hand.length / EncounterHand.ROTATION.CARDS;
+      let radius = 5;
       let alpha = factor * 2 * Math.PI * (EncounterHand.ROTATION.MAX - EncounterHand.ROTATION.MIN) / 360;
       let half = attrs.hand.length / 2;
-      cardTop = (i) => (1 - (i > half ? i - half : half - i) / half) * alpha * 5;
+      cardTop = (i) => (1 - (i > half ? i - half : half - i) / half) * alpha * radius;
     }
 
     return (
       <div class="relative"
         style={{ height: `calc(${Card.HEIGHT} + 0.5rem)` }}>
         {attrs.hand.map((card, i) => {
-          console.log(i, cardTop(i).toFixed(2));
           let hov = this.hovered == i;
           return (<div class="absolute"
             style={{
@@ -111,7 +111,6 @@ class EncounterCardPile {
   hover;
 
   generateRotations(n) {
-    console.log('generating', n)
     this.rotations = (this.rotations || []).concat(
       (new Array(n))
         .fill(null)
