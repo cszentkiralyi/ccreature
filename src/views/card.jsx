@@ -1,6 +1,8 @@
 import m from 'mithril';
 
 import Constants from '../lib/constants.js';
+import Affix from '../lib/affix.js';
+import Tooltip from './tooltip.jsx';
 
 class Card {
   static HEIGHT = '13rem';
@@ -33,7 +35,7 @@ class Card {
           {attrs.card.title}
         </div>
         <div class="flex flex-col m-2 items-center justify-center text-center">
-          {attrs.card.affixes.map(a => (<div>{a.toTooltipped()}</div>))}
+          {attrs.card.affixes.map(a => (<div>{this.tooltipAffix(a)}</div>))}
         </div>
         <div class="text-center opacity-60 text-sm">
           {rarityStr}
@@ -49,6 +51,20 @@ class Card {
           height: attrs.height || Card.HEIGHT,
           width: attrs.width || Card.WIDTH
         }} />
+    );
+  }
+
+  tooltipAffix(affix) {
+    return (
+      <span>
+        <Tooltip enum='AFFIX_ACTION' value={affix.action} />
+        {' '}
+        {[
+          affix.magnitude,
+          Affix.actionDataString(affix.action, affix.data)
+        ].filter(s => s != null).join(' ')
+        }
+      </span>
     );
   }
 }

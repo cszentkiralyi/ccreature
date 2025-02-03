@@ -1,9 +1,5 @@
-import m from 'mithril';
-
 import Constants from './constants.js';
 import Util from './util.js';
-
-import { Tooltip } from './tooltip.jsx';
 
 const AA = Constants.AFFIX_ACTION;
 const AP = Constants.AFFIX_POSITION;
@@ -33,20 +29,6 @@ class Affix {
       this.magnitude,
       Affix.actionDataString(this.action, this.data)
     ].filter(s => s != null).join(' ');
-  }
-
-  toTooltipped() {
-    return (
-      <span>
-        <Tooltip enum='AFFIX_ACTION' value={this.action} />
-        {' '}
-        {[
-          this.magnitude,
-          Affix.actionDataString(this.action, this.data)
-        ].filter(s => s != null).join(' ')
-        }
-      </span>
-    );
   }
 
   static actionDataString(action, data) {
@@ -108,6 +90,6 @@ const AFFIXES = {
       ['Healer\'s', 'Heal'],
       { action: AA.RESTORE, magnitude: 10, data: { resource: RES.LIFE }}),
   ]
-};
+}
 
-export { Affix, AFFIXES }
+export default Affix;

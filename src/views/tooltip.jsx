@@ -1,6 +1,6 @@
 import m from 'mithril';
-import Constants from './constants.js';
-import Util from './util.js';
+import Constants from '../lib/constants.js';
+import Util from '../lib/util.js';
 
 const TEXT = {
   'AFFIX_ACTION': {
@@ -27,4 +27,4 @@ class Tooltip {
 
 }
 
-export { Tooltip }
+export default Tooltip;

@@ -1,6 +1,6 @@
 import Constants from './constants.js';
 import Util from './util.js';
-import { Affix, AFFIXES } from './affix.jsx';
+import Affix from './affix.js';
 import AffixGen from '../data/affixes.js';
 
 const AP = Constants.AFFIX_POSITION;
@@ -117,4 +117,4 @@ class Card {
   }
 }
 
-export { Affix, Card, AFFIXES };
+export { Card };
