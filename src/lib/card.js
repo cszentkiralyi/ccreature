@@ -42,6 +42,14 @@ class Card {
     return false;
   }
 
+  get prefixes() {
+    return this.affixes.filter(a => a.position === AP.PREFIX);
+  }
+
+  get suffixes() {
+    return this.affixes.filter(a => a.position === AP.SUFFIX);
+  }
+
   get title() {
     let [prefixes, suffixes] =
       this.affixes.reduce(([p, s], a) => {
@@ -68,8 +76,6 @@ class Card {
     if (prefixes.length > 0) {
       t += prefixes[0].titles[1];
       t += ' ' + suffixes.map((s, i) => s.titles[i]).join(' ');
-    } else if (suffixes.length == 1) {
-      t += suffixes[0].titles[1];
     } else {
       t += suffixes.map((s, i) => s.titles[i]).join(' ')
     }
@@ -109,7 +115,13 @@ class Card {
 
     let card = new Card({ rarity: rarity }), i;
     for (i = 0; i < affixCount; i++) {
-      let affixData = AffixGen.generateAffixExcluding({ inst: card.affixes });
+      let affixFilter = { inst: card.affixes };
+      if (card.suffixes.length == 2) {
+        affixFilter.position = [AP.SUFFIX];
+      } else if (card.prefixes.length == 2) {
+        affixFilter.position = [AP.PREFIX];
+      }
+      let affixData = AffixGen.generateAffixExcluding(affixFilter);
       let affix = new Affix(affixData.position, affixData.titles, affixData.spec);
       card.addAffix(affix);
     }
