@@ -15,30 +15,40 @@ class EncounterScreen {
           gridTemplateRows: "20% 1.25fr 1fr"
         }}>
         <div class="">Blank</div>
-        <div class="">Enemy health</div>
+        <div class="">
+          <EncounterHealthbar entity={encounter.entities.enemy} />
+        </div>
         <div class="">Blank</div>
 
         <div class="cursor-pointer">
-          <EncounterCardPile count={encounter.entities['player'].deck.count('discard')} />
+          <EncounterCardPile count={encounter.entities.player.deck.count('discard')} />
         </div>
         <div class="">
           <div>Play area</div>
           <div><code>{Constants.ENCOUNTER_STATE.byVal[encounter.state]}</code></div>
           </div>
         <div class="cursor-pointer">
-          <EncounterCardPile count={encounter.entities['player'].deck.count('draw')}
+          <EncounterCardPile count={encounter.entities.player.deck.count('draw')}
             onclick={() => encounter.gameEvent('player-deck-click')}
           />
         </div>
 
-        <div class="">Life pool</div>
+        <div class="flex flex-col items-center justify-center">
+          <div>Life</div>
+          <div>{encounter.entities.player.life}/{encounter.entities.player.maxLife}</div>
+        </div>
         <div class="">
           <EncounterHand
-            hand={encounter.entities['player'].hand}
-            onselect={(card) => encounter.gameEvent('player-play-card', { card })}
+            hand={encounter.entities.player.hand}
+            onselect={encounter.state === Constants.ENCOUNTER_STATE.PLAYER_PLAY
+              ? (card) => encounter.gameEvent('player-play-card', { card })
+              : null}
              />
             </div>
-        <div class="">Mana pool</div>
+        <div class="flex flex-col items-center justify-center">
+          <div>Mana</div>
+          <div>{encounter.entities.player.mana}/{encounter.entities.player.maxMana}</div>
+        </div>
       </div>
     );
   }
@@ -93,7 +103,7 @@ class EncounterHand {
             onclick = () => { this.selected = null; attrs.onselect(card) };
           } else if (this.selected != null) {
             onclick = () => this.selected = null;
-          } else {
+          } else if (attrs.onselect) {
             onclick = () => this.selected = i;
           }
 
@@ -172,6 +182,19 @@ class EncounterCardPile {
         </div>
       </div>
     );
+  }
+}
+
+class EncounterHealthbar {
+  view({ attrs }) {
+    let pct = attrs.entity.life / attrs.entity.maxLife;
+    return (
+      <div class="flex w-full h-full items-center justify-center">
+        <div class="mx-4 my-2 border border-color-0 p-2" style={{ width: '80%' }}>
+          <div class="bg-black" style={{ width: `${(pct * 100).toFixed(1)}%` }}>&nbsp;</div>
+        </div>
+      </div>
+    )
   }
 }
 

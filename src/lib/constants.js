@@ -43,4 +43,6 @@ const Constants = {
   RESOURCE: gen_enum(['LIFE', 'MANA']),
 };
 
+Constants.gen_enum = gen_enum;
+
 export default Constants;

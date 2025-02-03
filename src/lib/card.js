@@ -11,10 +11,12 @@ class Card {
 
   affixes;
   rarity;
+  mana;
 
   constructor({ rarity, ...opts }) {
     this.rarity = rarity;
     this.affixes = (opts && opts.affixes) || [];
+    this.mana = (opts && opts.mana) || 0;
   }
 
   get affixes() { return [...this.affixes]; }
@@ -125,6 +127,9 @@ class Card {
       let affix = new Affix(affixData.position, affixData.titles, affixData.spec);
       card.addAffix(affix);
     }
+
+    card.mana = 1;
+
     return card;
   }
 }

@@ -2,10 +2,38 @@ import Constants from './constants.js';
 import Util from './util.js';
 
 const ES = Constants.ENCOUNTER_STATE;
+const AA = Constants.AFFIX_ACTION;
+const RES = Constants.RESOURCE;
+
+const CS = Constants.gen_enum([ 'PLAYER', 'ENEMY' ]);
+const CM = Constants.gen_enum([ 'PLAY', 'DRAW' ]);
 
 class GameEventHandler {
-  state;
-  nextState() { }
+  state = 'idle';
+  resumeState = null;
+  stateCycle = [];
+  stateQueue = [];
+  nextState() {
+    let next;
+    if (this.stateQueue.length > 1) {
+      this.state = this.stateQueue.pop();
+    } else if (this.stateQueue == 1) {
+      this.state = this.stateQueue.pop();
+      this.resumeState = this.stateCycle[0];
+    } else if (this.resumeState != null) {
+      this.state = this.resumeState;
+      this.resumeState = null;
+    } else if ((next = this.stateCycle.indexOf(this.state)) > -1) {
+      next++;
+      if (next >= this.stateCycle.length) next = 0;
+      this.state = this.stateCycle[next];
+    } else {
+      this.state = this.stateCycle[0];
+    }
+    this.handleState(this.state);
+  }
+  handleState(newState) { }
+  queueState(state) { this.stateQueue.push(state); }
   gameEvent(event, args, redraw) { redraw(); }
 }
 
@@ -54,28 +82,27 @@ class EncounterDeck {
 
 class EncounterEntity {
   // [current, max]
-  _resources = { life: [0, 0], mana: [0, 0] };
+  _resources = { [RES.LIFE]: [0, 0], [RES.MANA]: [0, 0] };
   deck;
   hand;
   gear;
   debuffs;
   
   constructor({ resources, cards, gear }) {
-    this._resources = {};
-    Object.keys(resources).forEach(k => this._resources[k] = [...resources[k]]);
+    Object.assign(this._resources, resources);
     this.deck = new EncounterDeck(cards);
     this.hand = [];
     this.gear = gear;
     this.debuffs = { stun: 0 }
   }
 
-  get life() { return this._resources.life[0] }
-  get maxLife() { return this._resources.life[1] }
-  set life(v) { this._resources.life[0] = Util.clamp(this.life + v, 0, this.maxLife); }
+  get life() { return this._resources[RES.LIFE][0] }
+  get maxLife() { return this._resources[RES.LIFE][1] }
+  set life(v) { this._resources[RES.LIFE][0] = Util.clamp(v, 0, this.maxLife); }
 
-  get mana() { return this._resources.mana[0] }
-  get maxMana() { return this._resources.mana[1] }
-  set mana(v) { this._resources.mana[0] = Util.clamp(this.mana + v, 0, this.maxMana); }
+  get mana() { return this._resources[RES.MANA][0] }
+  get maxMana() { return this._resources[RES.MANA][1] }
+  set mana(v) { this._resources[RES.MANA][0] = Util.clamp(v, 0, this.maxMana); }
 
   drawCard() {
     let card;
@@ -94,64 +121,112 @@ class EncounterEntity {
   applyDebuff(k, n) {
     this.debuffs[k] = (this.debuffs[k] || 0) + n;
   }
+
+  applyDamage(magnitude, damage) {
+    this.life -= magnitude;
+  }
+
+  applyRestore(magnitude, resource) {
+    this._resources[resource][0] = Util.clamp(
+      this._resources[resource][0] + magnitude,
+      0,
+      this._resources[resource][1]
+    );
+  }
 }
 
 class Encounter extends GameEventHandler {
   entities;
 
+  state = ES.BEGIN;
+  stateCycle = [ ES.PLAYER_PLAY, ES.PLAYER_DRAW ];
+
   constructor({ playerCards }) {
     super();
     this.entities = {
-      'player': new EncounterEntity({ cards: playerCards || [], resources: { life: [10, 10] }}),
-      'enemy': new EncounterEntity({ cards: [], resources: { life: [10, 10] }}),
+      'player': new EncounterEntity({
+         cards: playerCards || [],
+         resources: { [RES.LIFE]: [10, 10], [RES.MANA]: [10, 10] }}),
+      'enemy': new EncounterEntity({
+         cards: [],
+         resources: { [RES.LIFE]: [500, 500] }}),
     }
 
     this.state = ES.BEGIN;
-
-    for (var i = 0; i < 3; i++) {
-      this.entities.player.drawCard();
-    }
-
-    this.state = ES.PLAYER_PLAY;
+    this.handleState(this.state);
+    this.nextState();
   }
 
-  nextState() {
-    let next = null;
+  handleState(state) {
     if (this.entities.player.life == 0 || this.entities.enemy.life == 0) {
-      next = (this.entities.player.mana == 0) ? ES.PLAYER_WIN : ES.PLAYER_LOSE;
-    } else {
-      switch (this.state) {
-        case ES.PLAYER_PLAY:
-          next = ES.PLAYER_DRAW;
-          break;
-        case ES.PLAYER_DRAW:
-          next = ES.PLAYER_PLAY;
-          break;
-      }
+      this.state = (this.entities.enemy.life == 0) ? ES.PLAYER_WIN : ES.PLAYER_LOSE;
+      return;
     }
-    if (this.state !== next && next != null) this.state = next;
+
+    switch (state) {
+      case ES.BEGIN:
+        this.beginEncounter();
+        break;
+    }
   }
 
   gameEvent(event, args, redraw) {
-    console.log(event, args);
+    let force = args && args.force;
     switch (event) {
       case 'player-deck-click':
-        if (this.state == ES.PLAYER_DRAW) {
-          this.entities.player.drawCard()
+        if (this.state == ES.PLAYER_DRAW || force) {
+          let card = this.entities.player.drawCard()
+          this.handleCard(card, CS.PLAYER, CM.DRAW);
           this.nextState();
         }
         break;
       case 'player-play-card':
-        if (this.state == ES.PLAYER_PLAY) {
-          this.entities.player.discardCard(args.card);
-          this.handleCard(args.card);
-          this.nextState();
+        if (this.state == ES.PLAYER_PLAY || force) {
+          let mana = args.card.mana || 0;
+          if (this.entities.player.mana >= mana || force) {
+            this.entities.player.discardCard(args.card);
+            this.entities.player.mana -= mana;
+            this.handleCard(args.card, CS.PLAYER, CM.PLAY);
+            this.nextState();
+          }
         }
         break;
     }
   }
 
-  handleCard(card) {
+  handleCard(card, source, method) {
+    let target;
+    if (method == CM.DRAW) {
+      console.log(card.affixes, AA.AUTOPLAY, card.affixes.some(a => a.action === AA.AUTOPLAY));
+      if (card.affixes.some(a => a.action === AA.AUTOPLAY)) {
+        this.delay(() => this.gameEvent('player-play-card', { card: card, force: true }), 750);
+      }
+    } else if (method == CM.PLAY) {
+      card.affixes.forEach(affix => {
+        target = null;
+        switch (affix.action) {
+          case AA.ATTACK:
+            target = (source == CS.PLAYER) ? this.entities.enemy : this.entities.player;
+            target.applyDamage(affix.magnitude, affix.data.damage);
+            break;
+          case AA.RESTORE:
+            target = (source == CS.PLAYER) ? this.entities.player : this.entities.enemy;
+            console.log(affix);
+            target.applyRestore(affix.magnitude, affix.data.resource);
+            break;
+        }
+      });
+    }
+  }
+
+  beginEncounter() {
+    for (var i = 0; i < 3; i++) {
+      this.entities.player.drawCard();
+    }
+  }
+
+  delay(f, t) {
+    window.setTimeout(f, t);
   }
 }
 
