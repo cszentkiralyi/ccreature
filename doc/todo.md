@@ -19,6 +19,10 @@
   - [ ] Quests
   - [ ] Load/save
 
+## Known bugs
+
+1. [ ] Autoplay / Autoplay card got generated
+
 ## Priority 1
 
 - [ ] Encounter UI

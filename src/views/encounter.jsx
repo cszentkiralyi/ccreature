@@ -29,7 +29,7 @@ class EncounterScreen {
           </div>
         <div class="cursor-pointer">
           <EncounterCardPile count={encounter.entities.player.deck.count('draw')}
-            onclick={() => encounter.gameEvent('player-deck-click')}
+            onclick={() => this.curryGameEvent(encounter, 'player-draw-card')}
           />
         </div>
 
@@ -51,6 +51,10 @@ class EncounterScreen {
         </div>
       </div>
     );
+  }
+
+  curryGameEvent(encounter, event, args) {
+    encounter.gameEvent(event, args, () => m.redraw());
   }
 }
 
@@ -111,7 +115,7 @@ class EncounterHand {
             style={{
               height: Card.HEIGHT,
               width: Card.WIDTH,
-              fontSize: '85%',
+              fontSize: '75%',
               zIndex: hov ? 999 : i,
               top: `-${(cardTop(i) + (hov ? EncounterHand.CARD_RAISE_REM : 0)).toFixed(2)}rem`,
               bottom: 0,

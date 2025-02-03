@@ -75,11 +75,11 @@ class Card {
 
     let t = '';
     if (prefixes.length == 2) t = prefixes[1].titles[0] + ' ';
-    if (prefixes.length > 0) {
-      t += prefixes[0].titles[1];
-      t += ' ' + suffixes.map((s, i) => s.titles[i]).join(' ');
+    if (prefixes.length > 0) t += prefixes[0].titles[1] + ' ';
+    if (suffixes.length == 1) {
+      t += suffixes[0].titles[1];
     } else {
-      t += suffixes.map((s, i) => s.titles[i]).join(' ')
+      t += suffixes.reverse().map((s, i) => s.titles[i]).reverse().join(' ')
     }
     return t.trim();
   }

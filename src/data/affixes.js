@@ -37,6 +37,7 @@ const ALL_AFFIXES = [
     group: 'restore'
   },
 
+
   {
     position: AP.SUFFIX,
     titles: ['of Calm', 'Calming'],
@@ -49,6 +50,14 @@ const ALL_AFFIXES = [
     position: AP.SUFFIX,
     titles: ['of Flashing', 'Flash'],
     spec: { action: AA.AUTOPLAY },
+    weight: 25,
+    group: 'buff'
+  },
+
+  {
+    position: AP.SUFFIX,
+    titles: ['of Skill', 'Skill'],
+    spec: { action: AA.DRAW, magnitude: 1 },
     weight: 25,
     group: 'buff'
   }

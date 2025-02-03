@@ -30,7 +30,7 @@ class Card {
         onmouseenter={onmenter}
         onmouseleave={onmleave} >
         <div class={`flex px-4 border-b border-color-${rarityStr} bg-${rarityStr} bg-opacity-40
-         items-center text-left nowrap overflow-hidden overflow-ellipsis`}
+         items-center text-left`}
           style={{ borderWidth: "4px" }}>
           {attrs.card.title}
         </div>

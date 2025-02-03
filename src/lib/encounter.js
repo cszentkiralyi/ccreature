@@ -19,7 +19,7 @@ class GameEventHandler {
       this.state = this.stateQueue.pop();
     } else if (this.stateQueue == 1) {
       this.state = this.stateQueue.pop();
-      this.resumeState = this.stateCycle[0];
+      this.resumeState = this.resumeState || this.stateCycle[0];
     } else if (this.resumeState != null) {
       this.state = this.resumeState;
       this.resumeState = null;
@@ -173,11 +173,12 @@ class Encounter extends GameEventHandler {
   gameEvent(event, args, redraw) {
     let force = args && args.force;
     switch (event) {
-      case 'player-deck-click':
+      case 'player-draw-card':
         if (this.state == ES.PLAYER_DRAW || force) {
           let card = this.entities.player.drawCard()
           this.handleCard(card, CS.PLAYER, CM.DRAW);
-          this.nextState();
+          if (!force) this.nextState();
+          if (redraw) redraw();
         }
         break;
       case 'player-play-card':
@@ -187,7 +188,7 @@ class Encounter extends GameEventHandler {
             this.entities.player.discardCard(args.card);
             this.entities.player.mana -= mana;
             this.handleCard(args.card, CS.PLAYER, CM.PLAY);
-            this.nextState();
+            if (!force) this.nextState();
           }
         }
         break;
@@ -197,7 +198,6 @@ class Encounter extends GameEventHandler {
   handleCard(card, source, method) {
     let target;
     if (method == CM.DRAW) {
-      console.log(card.affixes, AA.AUTOPLAY, card.affixes.some(a => a.action === AA.AUTOPLAY));
       if (card.affixes.some(a => a.action === AA.AUTOPLAY)) {
         this.delay(() => this.gameEvent('player-play-card', { card: card, force: true }), 750);
       }
@@ -211,8 +211,11 @@ class Encounter extends GameEventHandler {
             break;
           case AA.RESTORE:
             target = (source == CS.PLAYER) ? this.entities.player : this.entities.enemy;
-            console.log(affix);
             target.applyRestore(affix.magnitude, affix.data.resource);
+            break;
+          case AA.DRAW:
+            target = (source == CS.PLAYER) ? this.entities.player : this.entities.enemy;
+            this.gameEvent('player-draw-card', { force: true });
             break;
         }
       });
