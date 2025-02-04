@@ -19,8 +19,6 @@ class Card {
     this.mana = (opts && opts.mana) || 0;
   }
 
-  get affixes() { return [...this.affixes]; }
-
   addAffix(affix) {
     if (this.affixes.length === Card.AFFIX_LIMIT) return false;
     this.affixes.push(affix);
@@ -43,6 +41,19 @@ class Card {
 
     return false;
   }
+
+  clone(o) {
+    let changes = o || {};
+    let spec = {
+      rarity: this.rarity,
+      affixes: this.affixes,
+      mana: this.mana,
+    };
+
+    return new Card(Object.assign(spec, changes));
+  }
+
+  get affixes() { return [...this.affixes]; }
 
   get prefixes() {
     return this.affixes.filter(a => a.position === AP.PREFIX);

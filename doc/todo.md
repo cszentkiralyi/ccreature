@@ -32,7 +32,7 @@
     - [x] Hand
     - [x] Discard pile
     - [ ] Play area
-    - [ ] Resource globes
+    - [x] Resource globes
   - [x] Actions
     - [x] Draw card
     - [x] Discard card
@@ -44,7 +44,7 @@
       - [ ] Boss
       - [ ] Elite
       - [ ] Rabble
-    - [ ] Draw & play AI
+    - [x] Draw & play AI
 - [ ] Game start
   - [ ] New game screen
   - [ ] Navigation menu

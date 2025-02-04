@@ -274,7 +274,15 @@ class Encounter {
           if (this.entities.enemy.mana >= mana || force) {
             this.entities.enemy.discardCard(args.card);
             this.entities.enemy.mana -= mana;
-            this.handleCard(args.card, CS.ENEMY, CM.PLAY);
+            // BEGIN TODO: nerf because no decks yet, remove this
+            let halfCard = args.card.clone({
+              affixes: args.card.affixes.map(a => {
+                if (a.magnitude > 4) { a.magnitude = Math.ceil(a.magnitude / 2); }
+                return a;
+              })
+            });
+            this.handleCard(/* args.card */ halfCard, CS.ENEMY, CM.PLAY);
+            // END TODO
             if (this.gameState == ES.ENEMY_PLAY && !force) this.nextGameState();
           }
         }
