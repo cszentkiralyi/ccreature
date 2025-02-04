@@ -24,7 +24,7 @@ class Archetype {
     return Math.floor(LEVEL_COEFFICIENT * Math.sqrt(this.experience));
   }
 
-  // TODO: update these to reference Constants.RESOURCE & Constants.ATTRIBUTE
+  // TODO: update these to reference Constants.RESOURCE & Constants.ATTRIBUTE maybe
   get life() {
     return this._base.resource.life + Math.floor(this.level * this._levelBonus.resource.life);
   }

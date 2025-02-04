@@ -22,6 +22,7 @@ const Constants = {
     'SPEED',
     'AREA',
     'DRAW',
+    'DISCARD',
   ]),
 
   AFFIX_POSITION: gen_enum(['PREFIX', 'SUFFIX']),
@@ -32,8 +33,10 @@ const Constants = {
     'BEGIN',
     'PLAYER_DRAW',
     'PLAYER_PLAY',
+    'PLAYER_DISCARD',
     'AI_DRAW',
     'AI_PLAY',
+    'AI_DISCARD',
     'PLAYER_WIN',
     'PLAYER_LOSE'
   ]),

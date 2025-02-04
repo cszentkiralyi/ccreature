@@ -23,7 +23,7 @@ const ALL_AFFIXES = [
   },
   {
     position: AP.PREFIX,
-    titles: ['Adept\'s', 'Mistake'],
+    titles: ['Adept\'s', 'Incision'],
     spec: { action: AA.ATTACK, magnitude: 10, data: { damage: DMG.DARK } },
     weight: 100,
     group: 'offense'
@@ -59,6 +59,13 @@ const ALL_AFFIXES = [
     titles: ['of Skill', 'Skill'],
     spec: { action: AA.DRAW, magnitude: 1 },
     weight: 25,
+    group: 'buff'
+  },
+  {
+    position: AP.SUFFIX,
+    titles: ['of Fumbling', 'Fumble'],
+    spec: { action: AA.DISCARD, magnitude: 1 },
+    weight: 1025,
     group: 'buff'
   }
 ];

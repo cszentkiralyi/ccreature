@@ -8,34 +8,37 @@ const RES = Constants.RESOURCE;
 const CS = Constants.gen_enum([ 'PLAYER', 'ENEMY' ]);
 const CM = Constants.gen_enum([ 'PLAY', 'DRAW' ]);
 
-class GameEventHandler {
+class GameLoop {
   state = 'idle';
-  resumeState = null;
-  stateCycle = [];
-  stateQueue = [];
-  redraw;
+  stateCycle;
+  stateQueue;
+  cycleIndex = 0;
+  handleState;
+
+  constructor(cycle, initial, handle) {
+    this.stateCycle = cycle;
+    this.stateQueue = [initial];
+    this.handleState = handle;
+  }
+
   nextState() {
-    let next;
-    if (this.stateQueue.length > 1) {
+    let q = this.stateQueue.length;
+    if (q > 1) {
+      this.state = this.stateQueue[0];
+      this.stateQueue = this.stateQueue.slice(1, q-1);
+    } else if (q == 1) {
       this.state = this.stateQueue.pop();
-    } else if (this.stateQueue == 1) {
-      this.state = this.stateQueue.pop();
-      this.resumeState = this.resumeState || this.stateCycle[0];
-    } else if (this.resumeState != null) {
-      this.state = this.resumeState;
-      this.resumeState = null;
-    } else if ((next = this.stateCycle.indexOf(this.state)) > -1) {
-      next++;
-      if (next >= this.stateCycle.length) next = 0;
-      this.state = this.stateCycle[next];
     } else {
-      this.state = this.stateCycle[0];
+      this.state = this.stateCycle[this.cycleIndex++];
+      if (this.cycleIndex > this.stateCycle.length - 1)
+        this.cycleIndex = 0;
     }
     this.handleState(this.state);
   }
-  handleState(newState) { }
-  queueState(state) { this.stateQueue.push(state); }
-  gameEvent(event, args, redraw) { redraw(); }
+
+  queueState(s) { this.stateQueue.push(s); }
+
+  setState(s) { this.state = s; }
 }
 
 class EncounterDeck {
@@ -105,6 +108,8 @@ class EncounterEntity {
   get maxMana() { return this._resources[RES.MANA][1] }
   set mana(v) { this._resources[RES.MANA][0] = Util.clamp(v, 0, this.maxMana); }
 
+  get speed() { return 1; }
+
   drawCard() {
     let card;
     if (card = this.deck.draw()) this.hand.push(card);
@@ -136,41 +141,56 @@ class EncounterEntity {
   }
 }
 
-class Encounter extends GameEventHandler {
+class Encounter {
   entities;
-
-  state = ES.BEGIN;
-  stateCycle = [ ES.PLAYER_PLAY, ES.PLAYER_DRAW ];
+  gameLoop;
 
   constructor({ player, redraw }) {
-    super();
     this.redraw = redraw;
+
     this.entities = {
-      'player': new EncounterEntity({
+      player: new EncounterEntity({
          cards: player.deck || [],
          resources: {
            [RES.LIFE]: [player.life, player.life],
            [RES.MANA]: [player.mana, player.life]
         }}),
-      'enemy': new EncounterEntity({
+      enemy: new EncounterEntity({
          cards: [],
          resources: { [RES.LIFE]: [50, 50] }}),
     }
 
-    this.state = ES.BEGIN;
-    this.handleState(this.state);
-    this.nextState();
+    let loopCycle = [
+      (new Array(this.entities.player.speed)).fill(ES.PLAYER_PLAY),
+      [ES.PLAYER_DRAW]
+    ];
+
+    this.gameLoop = new GameLoop(
+      loopCycle.reduce((m, a) => m.concat(a)),
+      ES.BEGIN,
+      (s) => this.handleGameState(s)
+    );
+
+    this.gameLoop.nextState(); // BEGIN
+    this.gameLoop.nextState(); // Progress to what's next
   }
 
-  handleState(state) {
+  get gameState() { return this.gameLoop.state; }
+  nextGameState() { this.gameLoop.nextState(); }
+  queueGameState(...args) { this.gameLoop.queueState(...args); }
+
+  handleGameState(state) {
     if (this.entities.player.life == 0 || this.entities.enemy.life == 0) {
-      this.state = (this.entities.enemy.life == 0) ? ES.PLAYER_WIN : ES.PLAYER_LOSE;
+      this.gameLoop.setState(this.entities.enemy.life == 0 ? ES.PLAYER_WIN : ES.PLAYER_LOSE);
       return;
     }
 
     switch (state) {
       case ES.BEGIN:
         this.beginEncounter();
+        break;
+      case ES.DISCARD:
+        if (this.entities.player.hand.length == 0) this.nextGameState();
         break;
     }
   }
@@ -179,23 +199,31 @@ class Encounter extends GameEventHandler {
     let force = args && args.force;
     switch (event) {
       case 'player-draw-card':
-        if (this.state == ES.PLAYER_DRAW || force) {
+        if (this.gameState == ES.PLAYER_DRAW || force) {
           let card = this.entities.player.drawCard()
           this.handleCard(card, CS.PLAYER, CM.DRAW);
-          if (!force) this.nextState();
+          if (this.gameState == ES.PLAYER_DRAW) this.nextGameState();
         }
         break;
       case 'player-play-card':
-        if (this.state == ES.PLAYER_PLAY || force) {
+        if (this.gameState == ES.PLAYER_PLAY || force) {
           let mana = args.card.mana || 0;
           if (this.entities.player.mana >= mana || force) {
             this.entities.player.discardCard(args.card);
             this.entities.player.mana -= mana;
             this.handleCard(args.card, CS.PLAYER, CM.PLAY);
-            if (!force) this.nextState();
+            if (this.gameState == ES.PLAYER_PLAY) this.nextGameState();
           }
         }
         break;
+      case 'player-discard-card':
+        if (this.gameState == ES.PLAYER_DISCARD || force) {
+          this.entities.player.discardCard(args.card);
+          if (!force) this.nextGameState();
+        }
+        break;
+      default:
+        throw `Unknown game event! '${event}'`;
     }
     this.redraw();
   }
@@ -204,7 +232,10 @@ class Encounter extends GameEventHandler {
     let target;
     if (method == CM.DRAW) {
       if (card.affixes.some(a => a.action === AA.AUTOPLAY)) {
-        this.delay(() => this.gameEvent('player-play-card', { card: card, force: true }), 750);
+        this.delay(() => {
+          this.gameEvent('player-play-card', { card: card, force: true });
+          this.redraw();
+        }, 750);
       }
     } else if (method == CM.PLAY) {
       card.affixes.forEach(affix => {
@@ -222,6 +253,11 @@ class Encounter extends GameEventHandler {
             target = (source == CS.PLAYER) ? this.entities.player : this.entities.enemy;
             this.gameEvent('player-draw-card', { force: true });
             break;
+          case AA.DISCARD:
+            for (var i = 0; i < affix.magnitude; i++) {
+              this.gameLoop.queueState((source == CS.PLAYER) ? ES.PLAYER_DISCARD : ES.AI_DISCARD);
+            }
+            break;
         }
       });
     }
@@ -236,6 +272,12 @@ class Encounter extends GameEventHandler {
   delay(f, t) {
     window.setTimeout(f, t);
   }
+
+
+  get canPlay() { return this.gameState == ES.PLAYER_PLAY; }
+  get canDiscard() { return this.gameState == ES.PLAYER_DISCARD; }
+  get canDraw() { return this.gameState == ES.PLAYER_DRAW; }
+
 }
 
 export default Encounter;

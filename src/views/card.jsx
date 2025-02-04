@@ -19,12 +19,12 @@ class Card {
     let onmenter = attrs.onhoverstart || ((e) => null);
     let onmleave = attrs.onhoverend || ((e) => null);
     return (
-      <div class="grid rounded bg-white border border-color-card shadow cursor-default noselect"
+      <div class={`grid rounded bg-white border border-color-card ${(attrs.shadow) || 'shadow'} cursor-default noselect`}
         style={{
           gridTemplateRows: '15% 1fr 1rem',
           borderWidth: '2px',
           height: attrs.height || Card.HEIGHT,
-          width: attrs.width || Card.WIDTH
+          width: attrs.width || Card.WIDTH,
         }}
         onclick={attrs.onclick}
         onmouseenter={onmenter}

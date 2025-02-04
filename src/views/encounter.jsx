@@ -8,6 +8,12 @@ import Card from './card.jsx';
 class EncounterScreen {
   view({ attrs }) {
     let encounter = attrs.encounter;
+    let onHandSelect = null;
+    if (encounter.canPlay) {
+      onHandSelect = (card) => encounter.gameEvent('player-play-card', { card });
+    } else if (encounter.canDiscard) {
+      onHandSelect = (card) => encounter.gameEvent('player-discard-card', { card });
+    }
     return (
       <div class="h-full w-full grid"
         style={{
@@ -25,7 +31,7 @@ class EncounterScreen {
         </div>
         <div class="">
           <div>Play area</div>
-          <div><code>{Constants.ENCOUNTER_STATE.byVal[encounter.state]}</code></div>
+          <div><code>{Constants.ENCOUNTER_STATE.byVal[encounter.gameState]}</code></div>
           </div>
         <div class="">
           <EncounterCardPile count={encounter.entities.player.deck.count('draw')}
@@ -41,9 +47,8 @@ class EncounterScreen {
         <div class="">
           <EncounterHand
             hand={encounter.entities.player.hand}
-            onselect={encounter.state === Constants.ENCOUNTER_STATE.PLAYER_PLAY
-              ? (card) => encounter.gameEvent('player-play-card', { card })
-              : null}
+            onselect={onHandSelect}
+            glow={encounter.canPlay ? 'glow-blue' : encounter.canDiscard ? 'glow-red' : null}
              />
             </div>
         <div class="">
@@ -127,6 +132,7 @@ class EncounterHand {
             }}>
             <Card card={card}
              onclick={onclick}
+             shadow={attrs.glow}
              onhoverstart={() => this.hovered = i}
              onhoverend={() => this.hovered = null} />
           </div>)
@@ -143,10 +149,7 @@ class EncounterCardPile {
 
   generateRotations(n) {
     this.rotations = (this.rotations || []).concat(
-      (new Array(n))
-        .fill(null)
-        .map(_ => Util.interp(EncounterCardPile.ROTATION.MIN,
-          EncounterCardPile.ROTATION.MAX, Math.random())));
+      Util.genArray(n, _ => Util.interp(EncounterCardPile.ROTATION.MIN, EncounterCardPile.ROTATION.MAX, Math.random())));
   }
 
   oninit(vnode) {
@@ -173,7 +176,7 @@ class EncounterCardPile {
             {attrs.count > 0 ? attrs.count : ''}
           </div>
           {
-            (new Array(attrs.count)).fill(null).map((_, i) => {
+            Util.genArray(attrs.count, i => {
               let rot = (this.rotations && this.rotations.length) > i
                 ? this.rotations[i]
                 : 0;

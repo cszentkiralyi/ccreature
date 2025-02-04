@@ -1,5 +1,6 @@
 import m from 'mithril';
 
+import Util from './lib/util.js';
 import Card from './lib/card.js';
 import Encounter from './lib/encounter.js';
 import Archetypes from './data/archetypes.js';
@@ -7,7 +8,7 @@ import Archetypes from './data/archetypes.js';
 import EncounterScreen from './views/encounter.jsx';
 
 const PLAYER = new Archetypes.Archetype();
-PLAYER.deck = (new Array(12)).fill(null).map(_ => Card.generate());
+PLAYER.deck = Util.genArray(12, _ => Card.generate());
 const TEST_ENCOUNTER = new Encounter({
   player: PLAYER,
   redraw: () => m.redraw()
