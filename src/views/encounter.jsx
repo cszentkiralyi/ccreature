@@ -4,23 +4,49 @@ import Util from '../lib/util.js';
 import Constants from '../lib/constants.js';
 
 import Card from './card.jsx';
+import Animations from './animations.js';
 
 class EncounterScreen {
+  animations = {};
+
   view({ attrs }) {
     let encounter = attrs.encounter;
     let onHandSelect = null;
     if (encounter.canPlay) {
-      onHandSelect = (card) => encounter.gameEvent('player-play-card', { card });
+      onHandSelect = (card) => {
+        encounter.gameEvent('player-play-card', { card });
+        this.startAnimation('play-card', card);
+      }
     } else if (encounter.canDiscard) {
       onHandSelect = (card) => encounter.gameEvent('player-discard-card', { card });
     }
+
     return (
       <div class="h-full w-full grid"
         style={{
           gridTemplateColumns: "20% 1fr 20%",
           gridTemplateRows: "20% 1.25fr 1fr"
         }}>
-        <div />
+        <div>
+          { 
+            this.animations['play-card']
+            ? (<Animations.Cards.PlayCard card={(<Card card={this.animations['play-card']} />)}
+                remove={() => {
+                  this.endAnimation('play-card');
+                  m.redraw();
+                }} />)
+              : null
+          }
+          { 
+            this.animations['draw-card']
+            ? (<Animations.Cards.DrawCard card={(<Card facedown={true} />)}
+                remove={() => {
+                  this.endAnimation('draw-card');
+                  m.redraw();
+                }} />)
+              : null
+          }
+        </div>
         <div class="">
           <EncounterHealthbar entity={encounter.entities.enemy} />
         </div>
@@ -35,7 +61,10 @@ class EncounterScreen {
           </div>
         <div class="">
           <EncounterCardPile count={encounter.entities.player.deck.count('draw')}
-            onclick={() => this.redrawGameEvent(encounter, 'player-draw-card')}
+            onclick={() => {
+              this.startAnimation('draw-card', true)
+              encounter.gameEvent('player-draw-card');
+            }}
           />
         </div>
 
@@ -60,8 +89,12 @@ class EncounterScreen {
     );
   }
 
-  redrawGameEvent(encounter, event, args) {
-    encounter.gameEvent(event, args, () => m.redraw());
+  startAnimation(anim, data) {
+    this.animations[anim] = data;
+  }
+  endAnimation(anim) {
+    if (!this.animations[anim]) throw `Can't stop non-running animation '${anim}'`;
+    delete this.animations[anim];
   }
 }
 

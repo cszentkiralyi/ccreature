@@ -193,10 +193,16 @@ body {
 .opacity-100 { opacity: 1; }
 .hover\:opacity-100:hover { opacity: 1; }
 
+.transition { transition-duration: var(--transition-duration); }
 
 .transition-fast { --transition-duration: 0.15s; }
+.transition-med { --transition-duration: 0.40s; }
+.transition-slow { --transition-duration: 1.0s; }
+
 .transition\:opacity { transition-property: opacity; transition-duration: var(--transition-duration); }
 .transition\:height { transition-property: height; transition-duration: var(--transition-duration); }
+.transition\:top { transition-property: top; transition-duration: var(--transition-duration); }
+.transition\:left { transition-property: left; transition-duration: var(--transition-duration); }
 
 /* Colors/themes
  *
