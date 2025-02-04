@@ -46,6 +46,15 @@ class EncounterScreen {
                 }} />)
               : null
           }
+          { 
+            this.animations['discard-card']
+            ? (<Animations.Cards.DiscardCard card={(<Card facedown={true} />)}
+                remove={() => {
+                  this.endAnimation('discard-card');
+                  m.redraw();
+                }} />)
+              : null
+          }
         </div>
         <div class="">
           <EncounterHealthbar entity={encounter.entities.enemy} />

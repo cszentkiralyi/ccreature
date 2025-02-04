@@ -46,6 +46,31 @@ class DrawCard extends BaseAnimations.TranslateAnimation {
   }
 }
 
+class DiscardCard extends BaseAnimations.TranslateAnimation {
+  verticalRange = { start: '60%', end: '25%' }
+  horizontalRange = { start: '70%', end: '40%' }
+  length = 400;
+
+  view({ attrs }) {
+    this.start();
+    return (
+      <div class="absolute inset-0" style={{ zIndex: 1 }}>
+        <div class="relative w-full h-full">
+          <div class="absolute transition transition-fast"
+            style={{
+              left: this.horizontal,
+              top: this.vertical,
+              transitionProperty: 'top, left',
+              transitionTimingFunction: 'linear'
+            }}>
+            {attrs.card}
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
 export default {
   PlayCard,
   DrawCard
