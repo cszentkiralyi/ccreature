@@ -25,7 +25,7 @@ class GameLoop {
     let q = this.stateQueue.length;
     if (q > 1) {
       this.state = this.stateQueue[0];
-      this.stateQueue = this.stateQueue.slice(1, q-1);
+      this.stateQueue = this.stateQueue.slice(1, q);
     } else if (q == 1) {
       this.state = this.stateQueue.pop();
     } else {
@@ -145,7 +145,10 @@ class Encounter {
   entities;
   gameLoop;
 
-  constructor({ player, redraw }) {
+  _player;
+  _enemy;
+
+  constructor({ player, enemy, redraw }) {
     this.redraw = redraw;
 
     this.entities = {
@@ -156,20 +159,25 @@ class Encounter {
            [RES.MANA]: [player.mana, player.life]
         }}),
       enemy: new EncounterEntity({
-         cards: [],
-         resources: { [RES.LIFE]: [50, 50] }}),
+         cards: enemy.deck || [],
+         resources: {
+           [RES.LIFE]: [enemy.life, enemy.life],
+           [RES.MANA]: [enemy.mana, enemy.mana]
+        }
+      }),
     }
 
+    this._player = player;
+    this._enemy = enemy;
+
     let loopCycle = [
-      (new Array(this.entities.player.speed)).fill(ES.PLAYER_PLAY),
-      [ES.PLAYER_DRAW]
+      ES.PLAYER_DRAW,
+      ...(new Array(this.entities.player.speed)).fill(ES.PLAYER_PLAY),
+      ES.ENEMY_DRAW,
+      ...(new Array(this.entities.enemy.speed)).fill(ES.ENEMY_PLAY)
     ];
 
-    this.gameLoop = new GameLoop(
-      loopCycle.reduce((m, a) => m.concat(a)),
-      ES.BEGIN,
-      (s) => this.handleGameState(s)
-    );
+    this.gameLoop = new GameLoop(loopCycle, ES.BEGIN, (s) => this.handleGameState(s));
 
     this.gameLoop.nextState(); // BEGIN
     this.gameLoop.nextState(); // Progress to what's next
@@ -192,6 +200,33 @@ class Encounter {
       case ES.DISCARD:
         if (this.entities.player.hand.length == 0) this.nextGameState();
         break;
+      case ES.ENEMY_DRAW:
+      case ES.ENEMY_PLAY:
+        this.enemyGameState(state);
+        break;
+    }
+  }
+
+  enemyGameState(state) {
+    let enemyGameEvent = (e, args) => {
+      let event = 'enemy-' + e;
+      window.setTimeout(() => {
+        this.gameEvent(event, args);
+        this.redraw();
+      }, 200);
+    };
+    switch (state) {
+      case ES.ENEMY_DRAW:
+        enemyGameEvent('draw-card');
+        break;
+      case ES.ENEMY_PLAY:
+        this._enemy.takeTurn({
+          hand: this.entities.enemy.hand,
+          life: this.entities.enemy.life,
+          mana: this.entities.enemy.mana,
+          gameEvent: enemyGameEvent
+        });
+        break;
     }
   }
 
@@ -202,7 +237,7 @@ class Encounter {
         if (this.gameState == ES.PLAYER_DRAW || force) {
           let card = this.entities.player.drawCard()
           this.handleCard(card, CS.PLAYER, CM.DRAW);
-          if (this.gameState == ES.PLAYER_DRAW) this.nextGameState();
+          if (this.gameState == ES.PLAYER_DRAW && !force) this.nextGameState();
         }
         break;
       case 'player-play-card':
@@ -212,16 +247,39 @@ class Encounter {
             this.entities.player.discardCard(args.card);
             this.entities.player.mana -= mana;
             this.handleCard(args.card, CS.PLAYER, CM.PLAY);
-            if (this.gameState == ES.PLAYER_PLAY) this.nextGameState();
+            if (this.gameState == ES.PLAYER_PLAY && !force) this.nextGameState();
           }
         }
         break;
       case 'player-discard-card':
         if (this.gameState == ES.PLAYER_DISCARD || force) {
           this.entities.player.discardCard(args.card);
-          if (!force) this.nextGameState();
+          if (this.gameState == ES.PLAYER_DISCARD && !force) this.nextGameState();
         }
         break;
+
+      case 'enemy-draw-card':
+        if (this.gameState == ES.ENEMY_DRAW || force) {
+          let card = this.entities.enemy.drawCard()
+          this.handleCard(card, CS.ENEMY, CM.DRAW);
+          if (this.gameState == ES.ENEMY_DRAW && !force) this.nextGameState();
+        }
+        break;
+      case 'enemy-pass':
+        if (this.gameState == ES.ENEMY_PLAY && !force) this.nextGameState();
+        break;
+      case 'enemy-play-card':
+        if (this.gameState == ES.ENEMY_PLAY || force) {
+          let mana = args.card.mana || 0;
+          if (this.entities.enemy.mana >= mana || force) {
+            this.entities.enemy.discardCard(args.card);
+            this.entities.enemy.mana -= mana;
+            this.handleCard(args.card, CS.ENEMY, CM.PLAY);
+            if (this.gameState == ES.ENEMY_PLAY && !force) this.nextGameState();
+          }
+        }
+        break;
+
       default:
         throw `Unknown game event! '${event}'`;
     }
@@ -232,8 +290,9 @@ class Encounter {
     let target;
     if (method == CM.DRAW) {
       if (card.affixes.some(a => a.action === AA.AUTOPLAY)) {
+        let event = (source == CS.PLAYER ? 'player-' : 'enemy-') + 'play-card';
         this.delay(() => {
-          this.gameEvent('player-play-card', { card: card, force: true });
+          this.gameEvent(event, { card: card, force: true });
           this.redraw();
         }, 750);
       }
@@ -255,7 +314,7 @@ class Encounter {
             break;
           case AA.DISCARD:
             for (var i = 0; i < affix.magnitude; i++) {
-              this.gameLoop.queueState((source == CS.PLAYER) ? ES.PLAYER_DISCARD : ES.AI_DISCARD);
+              this.gameLoop.queueState((source == CS.PLAYER) ? ES.PLAYER_DISCARD : ES.ENEMY_DISCARD);
             }
             break;
         }

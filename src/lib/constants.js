@@ -34,9 +34,9 @@ const Constants = {
     'PLAYER_DRAW',
     'PLAYER_PLAY',
     'PLAYER_DISCARD',
-    'AI_DRAW',
-    'AI_PLAY',
-    'AI_DISCARD',
+    'ENEMY_DRAW',
+    'ENEMY_PLAY',
+    'ENEMY_DISCARD',
     'PLAYER_WIN',
     'PLAYER_LOSE'
   ]),

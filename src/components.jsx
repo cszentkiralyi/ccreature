@@ -4,13 +4,18 @@ import Util from './lib/util.js';
 import Card from './lib/card.js';
 import Encounter from './lib/encounter.js';
 import Archetypes from './data/archetypes.js';
+import Enemies from './data/enemies.js';
 
 import EncounterScreen from './views/encounter.jsx';
 
 const PLAYER = new Archetypes.Archetype();
 PLAYER.deck = Util.genArray(12, _ => Card.generate());
+
+const ENEMY = Enemies.EnemyArchetype.create(Enemies.ENEMY_KIND.RABBLE, 1);
+ENEMY.deck = Util.genArray(2, _ => Card.generate());
 const TEST_ENCOUNTER = new Encounter({
   player: PLAYER,
+  enemy: ENEMY,
   redraw: () => m.redraw()
 });
 

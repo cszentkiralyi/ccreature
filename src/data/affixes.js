@@ -65,7 +65,7 @@ const ALL_AFFIXES = [
     position: AP.SUFFIX,
     titles: ['of Fumbling', 'Fumble'],
     spec: { action: AA.DISCARD, magnitude: 1 },
-    weight: 1025,
+    weight: 25,
     group: 'buff'
   }
 ];
