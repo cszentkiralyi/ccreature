@@ -59,7 +59,18 @@ const groupBy = (coll, f) => {
     m[k].push(e);
     return m;
   }, {});
+
 }
+
+/** Generate an array of c elements by calling f(index) per element */
+// TODO: utilize this everywhere I'm (new Array(c)).fill(null).map(...)-ing
+const genArray = (c, f) => {
+  let ret = [], i;
+  for (i = 0; i < c; i++) {
+    ret.push(f(i));
+  }
+  return ret;
+};
 
 export default {
   captialize,

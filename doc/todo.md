@@ -39,8 +39,12 @@
     - [x] Play card
     - [x] Gain/lose resources
   - [ ] Enemy
-    - [ ] Archetype
-    - [ ] Draw & play
+    - [ ] Archetypes
+      - [ ] Base
+      - [ ] Boss
+      - [ ] Elite
+      - [ ] Rabble
+    - [ ] Draw & play AI
 - [ ] Game start
   - [ ] New game screen
   - [ ] Navigation menu

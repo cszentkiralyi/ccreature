@@ -13,6 +13,7 @@ class GameEventHandler {
   resumeState = null;
   stateCycle = [];
   stateQueue = [];
+  redraw;
   nextState() {
     let next;
     if (this.stateQueue.length > 1) {
@@ -141,15 +142,19 @@ class Encounter extends GameEventHandler {
   state = ES.BEGIN;
   stateCycle = [ ES.PLAYER_PLAY, ES.PLAYER_DRAW ];
 
-  constructor({ playerCards }) {
+  constructor({ player, redraw }) {
     super();
+    this.redraw = redraw;
     this.entities = {
       'player': new EncounterEntity({
-         cards: playerCards || [],
-         resources: { [RES.LIFE]: [10, 10], [RES.MANA]: [10, 10] }}),
+         cards: player.deck || [],
+         resources: {
+           [RES.LIFE]: [player.life, player.life],
+           [RES.MANA]: [player.mana, player.life]
+        }}),
       'enemy': new EncounterEntity({
          cards: [],
-         resources: { [RES.LIFE]: [500, 500] }}),
+         resources: { [RES.LIFE]: [50, 50] }}),
     }
 
     this.state = ES.BEGIN;
@@ -170,7 +175,7 @@ class Encounter extends GameEventHandler {
     }
   }
 
-  gameEvent(event, args, redraw) {
+  gameEvent(event, args) {
     let force = args && args.force;
     switch (event) {
       case 'player-draw-card':
@@ -178,7 +183,6 @@ class Encounter extends GameEventHandler {
           let card = this.entities.player.drawCard()
           this.handleCard(card, CS.PLAYER, CM.DRAW);
           if (!force) this.nextState();
-          if (redraw) redraw();
         }
         break;
       case 'player-play-card':
@@ -193,6 +197,7 @@ class Encounter extends GameEventHandler {
         }
         break;
     }
+    this.redraw();
   }
 
   handleCard(card, source, method) {
@@ -233,4 +238,4 @@ class Encounter extends GameEventHandler {
   }
 }
 
-export { Encounter };
+export default Encounter;

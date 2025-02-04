@@ -14,6 +14,7 @@ body {
 
   --border-color: transparent; /* God bless modern CSS */
   --background-opacity: 1;
+  --transition-duration: 0;
 }
 
 
@@ -178,6 +179,7 @@ body {
 .flex-row { flex-direction: row; }
 
 .items-center { align-items: center; }
+.items-end { align-items: end; }
 .justify-center { justify-content: center; }
 
 
@@ -190,7 +192,9 @@ body {
 .hover\:opacity-100:hover { opacity: 1; }
 
 
-.transition\:opacity { transition-property: opacity; transition-duration: 0.15s; }
+.transition-fast { --transition-duration: 0.15s; }
+.transition\:opacity { transition-property: opacity; transition-duration: var(--transition-duration); }
+.transition\:height { transition-property: height; transition-duration: var(--transition-duration); }
 
 /* Colors/themes
  *

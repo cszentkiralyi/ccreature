@@ -14,28 +14,29 @@ class EncounterScreen {
           gridTemplateColumns: "20% 1fr 20%",
           gridTemplateRows: "20% 1.25fr 1fr"
         }}>
-        <div class="">Blank</div>
+        <div />
         <div class="">
           <EncounterHealthbar entity={encounter.entities.enemy} />
         </div>
-        <div class="">Blank</div>
+        <div />
 
-        <div class="cursor-pointer">
+        <div class="">
           <EncounterCardPile count={encounter.entities.player.deck.count('discard')} />
         </div>
         <div class="">
           <div>Play area</div>
           <div><code>{Constants.ENCOUNTER_STATE.byVal[encounter.state]}</code></div>
           </div>
-        <div class="cursor-pointer">
+        <div class="">
           <EncounterCardPile count={encounter.entities.player.deck.count('draw')}
-            onclick={() => this.curryGameEvent(encounter, 'player-draw-card')}
+            onclick={() => this.redrawGameEvent(encounter, 'player-draw-card')}
           />
         </div>
 
-        <div class="flex flex-col items-center justify-center">
-          <div>Life</div>
-          <div>{encounter.entities.player.life}/{encounter.entities.player.maxLife}</div>
+        <div class="">
+          <EncounterResourceGlobe position="left" color="#f00"
+           current={encounter.entities.player.life}
+           max={encounter.entities.player.maxLife} />
         </div>
         <div class="">
           <EncounterHand
@@ -45,15 +46,16 @@ class EncounterScreen {
               : null}
              />
             </div>
-        <div class="flex flex-col items-center justify-center">
-          <div>Mana</div>
-          <div>{encounter.entities.player.mana}/{encounter.entities.player.maxMana}</div>
+        <div class="">
+          <EncounterResourceGlobe position="right" color="#00f"
+           current={encounter.entities.player.mana}
+           max={encounter.entities.player.maxMana} />
         </div>
       </div>
     );
   }
 
-  curryGameEvent(encounter, event, args) {
+  redrawGameEvent(encounter, event, args) {
     encounter.gameEvent(event, args, () => m.redraw());
   }
 }
@@ -165,8 +167,8 @@ class EncounterCardPile {
         <div class="relative"
          style={{ height: Card.HEIGHT, width: Card.WIDTH }}
          onclick={onclick}>
-          <div class="absolute flex inset-0 items-center justify-center noselect
-            hover:opacity-100 opacity-0 transition:opacity text-xl text-white"
+          <div class="absolute flex inset-0 items-center justify-center pointer-events-none
+            hover:opacity-100 opacity-0 transition:opacity transition-fast text-xl text-white"
             style={{ zIndex: 1000 }}>
             {attrs.count > 0 ? attrs.count : ''}
           </div>
@@ -176,7 +178,7 @@ class EncounterCardPile {
                 ? this.rotations[i]
                 : 0;
               return (
-                <div class="absolute inset-0"
+                <div class="absolute inset-0 cursor-pointer"
                  style={{ transform: `rotate(${rot.toFixed(2)}deg)` }}>
                   <Card facedown={true} />
                 </div>
@@ -199,6 +201,45 @@ class EncounterHealthbar {
         </div>
       </div>
     )
+  }
+}
+
+class EncounterResourceGlobe {
+  static DIAMETER = 16; // rem
+  static OFFSET_PCT = 0.33;
+
+  view({ attrs }) {
+    let { position, color, current, max } = attrs;
+    let pct = current / max;
+    let offset = EncounterResourceGlobe.DIAMETER * EncounterResourceGlobe.OFFSET_PCT;
+    let offsetPctComp = 1 - EncounterResourceGlobe.OFFSET_PCT;
+
+    let globeHeight = `calc(${(EncounterResourceGlobe.OFFSET_PCT * 100).toFixed(0)}% + ${offsetPctComp.toFixed(2)} * ${(pct * 100).toFixed(1)}%)`;
+
+    return (
+      <div class="relative w-full h-full overflow-hidden">
+        <div class="absolute w-full flex justify-center pointer-events-none text-white"
+          style={{
+            zIndex: 1,
+            top: `${(offsetPctComp * EncounterResourceGlobe.DIAMETER).toFixed(0)}rem`,
+            insetX: 0,
+            [position]: `-${offset}rem`
+          }}>
+          {current} / {max}
+        </div>
+        <div class="absolute flex overflow-hidden border border-color-0 items-end"
+          style={{
+            height: `${EncounterResourceGlobe.DIAMETER}rem`,
+            width: `${EncounterResourceGlobe.DIAMETER}rem`,
+            top: `${offset}rem`,
+            [position]: `-${offset}rem`,
+            borderRadius: `${EncounterResourceGlobe.DIAMETER * 2}rem`
+          }}>
+          <div class="w-full transition:height transition-fast"
+           style={{ height: globeHeight, backgroundColor: color }} />
+        </div>
+      </div>
+    );
   }
 }
 
