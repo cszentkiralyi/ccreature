@@ -14,46 +14,18 @@ const PLAYER = new Archetypes.TheMeat();
 const ENEMY = Enemies.EnemyArchetype.create(Enemies.ENEMY_KIND.RABBLE, 1);
 
 class App {
-  _h;
-  _w;
-
-  _obs;
-
   _encounter;
   _profile;
 
   constructor() {
-    this.updateDims(true);
-    this._obs = new ResizeObserver((entries) => this.updateDims());
-    this._obs.observe(window.document.body);
-
     this._profile = new Profile(new Archetypes.TheMeat());
   }
 
-  updateDims(preventRedraw) {
-    let winW = this._w = window.innerWidth,
-      winH = this._h = window.innerHeight;
-    let minRatio = 16 / 9;
-    if (winW / winH < minRatio) {
-      this._h = (9 * winW) / 16;
-    }
-
-    if (!preventRedraw) m.redraw();
-  }
-
-  onbeforeremove() {
-    if (this._obs) {
-      this._obs.disconnect();
-    }
-  }
-
   view() {
-    let h = this._h, w = this._w;
     let route = m.route.get();
     return (
-      <div class="grid overflow-hidden"
-        style={{ height: h + 'px', width: w + 'px', marginTop: 'auto',
-          gridTemplateRows: '3rem 1fr' }}>
+      <div class="grid w-full h-full overflow-hidden"
+        style={{ gridTemplateRows: '3rem 1fr' }}>
         <NavigationBar route={route} />
         {this.renderRoute(route)}
       </div>
