@@ -5,6 +5,7 @@ import Card from './lib/card.js';
 import Encounter from './lib/encounter.js';
 import Archetypes from './data/archetypes.js';
 import Enemies from './data/enemies.js';
+import Profile from './data/profile.js';
 
 import EncounterScreen from './views/encounter.jsx';
 import LabScreen from './views/lab.jsx';
@@ -19,11 +20,14 @@ class App {
   _obs;
 
   _encounter;
+  _profile;
 
   constructor() {
     this.updateDims(true);
     this._obs = new ResizeObserver((entries) => this.updateDims());
     this._obs.observe(window.document.body);
+
+    this._profile = new Profile(new Archetypes.TheMeat());
   }
 
   updateDims(preventRedraw) {
@@ -59,7 +63,7 @@ class App {
   renderRoute(route) {
     if (route.startsWith('/encounter')) {
       this._encounter = this._encounter || new Encounter({
-        player: PLAYER,
+        player: this._profile,
         enemy: ENEMY,
         redraw: () => m.redraw()
       });
