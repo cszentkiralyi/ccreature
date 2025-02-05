@@ -1,5 +1,7 @@
 const LEVEL_COEFFICIENT = 0.75;
 
+import Card from '../lib/card.js';
+
 class Archetype {
   experience;
   deck;
@@ -62,7 +64,19 @@ class TheMeat extends Archetype {
     super();
     this._levelBonus.resource.life = 4;
     this._levelBonus.attribute.str = 1;
-    this._levelBonus.deckSize.min = -0.5;
+    this._levelBonus.deckSize = { min: -0.25, max: 0.5 };
+
+    this.deck = [
+      ...(new Array(6)).fill(Card.parse(`Strike
+        Common
+        Attack 3 Physical`)),
+      ...(new Array(4)).fill(Card.parse(`Analyze
+        Common
+        Restore 4 Mana`)),
+      ...(new Array(2)).fill(Card.parse(`Train
+        Common
+        Restore 2 Life`)),
+    ];
   }
 }
 

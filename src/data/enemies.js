@@ -1,5 +1,6 @@
 import Constants from '../lib/constants.js';
 import Util from '../lib/constants.js';
+import Card from '../lib/card.js';
 
 const ENEMY_KIND = Constants.gen_enum([ 'RABBLE', 'ELITE', 'BOSS' ]);
 
@@ -54,6 +55,15 @@ class EnemyArchetype {
 class EnemyRabble extends EnemyArchetype {
   constructor(level) {
     super(level);
+
+    this.deck = [
+      ...(new Array(8)).fill(Card.parse(`Fear
+        Common
+        Attack 2 Physical`)),
+      ...(new Array(4)).fill(Card.parse(`Recover
+        Common
+        Restore 4 Mana`))
+    ];
   }
 
   takeTurn({ hand, life, mana, gameEvent }) {

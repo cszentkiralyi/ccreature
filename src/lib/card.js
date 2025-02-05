@@ -145,7 +145,7 @@ class Card {
   }
 
   static parse(s) {
-    let [titleLine, rarityString, ...affixStrings] = s.split('\n');
+    let [titleLine, rarityString, ...affixStrings] = s.split('\n').map(s => s.trim());
     let titleTokens = titleLine.split(' ');
     let title1, title2, title3, title4;
     if (titleTokens.length > 4) {
@@ -158,13 +158,7 @@ class Card {
     }
     let titles = [title1, title2, title3, title4].filter(x => x);
     
-    let rarity;
-    switch (titles.count) {
-      case 2: rarity = R.MAGIC; break;
-      case 3:
-      case 4: rarity = R.RARE; break;
-      default: rarity = R.COMMON; break;
-    }
+    let rarity = R[rarityString.toUpperCase()];
 
     let affixes = affixStrings.map((astr, i) => {
       let spec = Affix.parse(astr);
