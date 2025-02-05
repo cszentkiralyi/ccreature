@@ -39,14 +39,16 @@ class Affix {
     }
   }
 
-  static parseAction(s) {
+  static parse(s) {
     let tokens = s.split(' ');
-    let [action, magnitude, ...misc] = tokens;
+    let [actionStr, magnitude, ...misc] = tokens;
     let data = null;
+    let action = AA[actionStr.toUpperCase()];
     if (magnitude) magnitude = parseInt(magnitude, 10);
-    if (misc.length > 0) data = parseActionData(action, misc);
+    if (misc.length > 0) data = this.parseActionData(action, misc);
     return { action, magnitude, data };
   }
+
   static parseActionData(action, misc) {
     switch (action) {
       case AA.ATTACK:

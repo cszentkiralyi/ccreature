@@ -148,8 +148,9 @@ class Encounter {
   _player;
   _enemy;
 
-  constructor({ player, enemy, redraw }) {
+  constructor({ player, enemy, animate, redraw }) {
     this.redraw = redraw;
+    this.animate = animate;
 
     this.entities = {
       player: new EncounterEntity({
@@ -232,9 +233,11 @@ class Encounter {
 
   gameEvent(event, args) {
     let force = args && args.force;
+    let animate = false;
     switch (event) {
       case 'player-draw-card':
         if (this.gameState == ES.PLAYER_DRAW || force) {
+          animate = true;
           let card = this.entities.player.drawCard()
           this.handleCard(card, CS.PLAYER, CM.DRAW);
           if (this.gameState == ES.PLAYER_DRAW && !force) this.nextGameState();
@@ -244,6 +247,7 @@ class Encounter {
         if (this.gameState == ES.PLAYER_PLAY || force) {
           let mana = args.card.mana || 0;
           if (this.entities.player.mana >= mana || force) {
+            animate = true;
             this.entities.player.discardCard(args.card);
             this.entities.player.mana -= mana;
             this.handleCard(args.card, CS.PLAYER, CM.PLAY);
@@ -253,6 +257,7 @@ class Encounter {
         break;
       case 'player-discard-card':
         if (this.gameState == ES.PLAYER_DISCARD || force) {
+          animate = true;
           this.entities.player.discardCard(args.card);
           if (this.gameState == ES.PLAYER_DISCARD && !force) this.nextGameState();
         }
@@ -272,6 +277,7 @@ class Encounter {
         if (this.gameState == ES.ENEMY_PLAY || force) {
           let mana = args.card.mana || 0;
           if (this.entities.enemy.mana >= mana || force) {
+            animate = true;
             this.entities.enemy.discardCard(args.card);
             this.entities.enemy.mana -= mana;
             // BEGIN TODO: nerf because no decks yet, remove this
@@ -291,6 +297,8 @@ class Encounter {
       default:
         throw `Unknown game event! '${event}'`;
     }
+
+    if (animate) this.animate(event, args);
     this.redraw();
   }
 

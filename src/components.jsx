@@ -12,7 +12,17 @@ const PLAYER = new Archetypes.Archetype();
 PLAYER.deck = Util.genArray(12, _ => Card.generate());
 
 const ENEMY = Enemies.EnemyArchetype.create(Enemies.ENEMY_KIND.RABBLE, 1);
-ENEMY.deck = Util.genArray(2, _ => Card.generate());
+ENEMY.deck = [
+  `Fear
+Common
+Attack 2 Physical`,
+`Recover
+Common
+Restore 2 Mana`
+].map(s => Card.parse(s));
+for (var i = 0; i < 5; i++) {
+  ENEMY.deck = ENEMY.deck.concat(ENEMY.deck);
+}
 const TEST_ENCOUNTER = new Encounter({
   player: PLAYER,
   enemy: ENEMY,

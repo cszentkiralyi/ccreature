@@ -271,3 +271,21 @@ body {
 .border-color-rare {
   border-color: #993;
 }
+
+/* Animations */
+@keyframes play-card-north {
+  0% { top: 60vh; opacity: 0; }
+  60% { top: 25vh; opacity: 1; }
+  100% { top: 25vh; }
+}
+
+@keyframes play-card-south {
+  0% { top: 0; opacity: 0;}
+  60% { top: 25vh; opacity: 1; }
+  100% { top: 25vh; }
+}
+
+@keyframes player-draw-card {
+  from { top: 25vh; left: 80vw; }
+  to { top: 60vh; left: 70vw; }
+}

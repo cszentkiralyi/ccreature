@@ -4,10 +4,15 @@ import Util from '../lib/util.js';
 import Constants from '../lib/constants.js';
 
 import Card from './card.jsx';
-import Animations from './animations.js';
+import Animation from './animation.jsx';
 
 class EncounterScreen {
   animations = {};
+  animationQueue = {};
+
+  oninit({ attrs }) {
+    attrs.encounter.animate = (...args) => this.animate(...args);
+  }
 
   view({ attrs }) {
     let encounter = attrs.encounter;
@@ -15,7 +20,6 @@ class EncounterScreen {
     if (encounter.canPlay) {
       onHandSelect = (card) => {
         encounter.gameEvent('player-play-card', { card });
-        this.startAnimation('play-card', card);
       }
     } else if (encounter.canDiscard) {
       onHandSelect = (card) => encounter.gameEvent('player-discard-card', { card });
@@ -28,33 +32,7 @@ class EncounterScreen {
           gridTemplateRows: "20% 1.25fr 1fr"
         }}>
         <div>
-          { 
-            this.animations['play-card']
-            ? (<Animations.Cards.PlayCard card={(<Card card={this.animations['play-card']} />)}
-                remove={() => {
-                  this.endAnimation('play-card');
-                  m.redraw();
-                }} />)
-              : null
-          }
-          { 
-            this.animations['draw-card']
-            ? (<Animations.Cards.DrawCard card={(<Card facedown={true} />)}
-                remove={() => {
-                  this.endAnimation('draw-card');
-                  m.redraw();
-                }} />)
-              : null
-          }
-          { 
-            this.animations['discard-card']
-            ? (<Animations.Cards.DiscardCard card={(<Card facedown={true} />)}
-                remove={() => {
-                  this.endAnimation('discard-card');
-                  m.redraw();
-                }} />)
-              : null
-          }
+          { this.renderAnimations() }
         </div>
         <div class="">
           <EncounterHealthbar entity={encounter.entities.enemy} />
@@ -67,43 +45,104 @@ class EncounterScreen {
         <div class="">
           <div>Play area</div>
           <div><code>{Constants.ENCOUNTER_STATE.byVal[encounter.gameState]}</code></div>
-          </div>
+        </div>
         <div class="">
           <EncounterCardPile count={encounter.entities.player.deck.count('draw')}
-            onclick={() => {
-              this.startAnimation('draw-card', true)
-              encounter.gameEvent('player-draw-card');
-            }}
+            onclick={() => encounter.gameEvent('player-draw-card')}
           />
         </div>
 
         <div class="">
           <EncounterResourceGlobe position="left" color="#f00"
-           current={encounter.entities.player.life}
-           max={encounter.entities.player.maxLife} />
+            current={encounter.entities.player.life}
+            max={encounter.entities.player.maxLife} />
         </div>
         <div class="">
           <EncounterHand
             hand={encounter.entities.player.hand}
             onselect={onHandSelect}
             glow={encounter.canPlay ? 'glow-blue' : encounter.canDiscard ? 'glow-red' : null}
-             />
-            </div>
+          />
+        </div>
         <div class="">
           <EncounterResourceGlobe position="right" color="#00f"
-           current={encounter.entities.player.mana}
-           max={encounter.entities.player.maxMana} />
+            current={encounter.entities.player.mana}
+            max={encounter.entities.player.maxMana} />
         </div>
       </div>
     );
   }
 
+  renderAnimations() {
+    let a = this.animations;
+    return (
+      <div>
+          {
+            a['play-card']
+            ? (<Animation animation={a['play-card'].source == 'player'
+                  ? 'play-card-north' : 'play-card-south'}
+                duration="1.2s"
+                style={{ left: '45%', zIndex: 999 }}
+                onend={() => this.endAnimation('play-card')}>
+                <Card card={a['play-card'].card} />
+              </Animation>)
+            : null
+          }
+          {
+            this.animations['draw-card']
+            ? (<Animation animation='player-draw-card'
+                duration="0.25s" style={{ zIndex: 999 }}
+                onend={() => this.endAnimation('draw-card')}>
+                <Card facedown={true} />
+              </Animation>)
+            : null
+          }
+      </div>
+    )
+  }
+
+  animate(event, args) {
+    console.log('animate', event, args);
+    switch (event) {
+      case 'enemy-play-card':
+        this.queueAnimation('play-card', { card: args.card, source: 'enemy' });
+        break;
+      case 'player-play-card':
+        this.queueAnimation('play-card', { card: args.card, source: 'player' });
+        break;
+      case 'player-draw-card':
+        this.queueAnimation('draw-card', true);
+        break;
+    }
+  }
+
   startAnimation(anim, data) {
     this.animations[anim] = data;
+    m.redraw();
   }
+
+  queueAnimation(anim, data) {
+    if (!this.animations[anim]) {
+      this.startAnimation(anim, data);
+      m.redraw();
+    } else {
+      let q = this.animationQueue[anim] || [];
+      q.push(data);
+      this.animationQueue[anim] = q;
+    }
+  }
+
   endAnimation(anim) {
+    let queue = this.animationQueue[anim] || [];
     if (!this.animations[anim]) throw `Can't stop non-running animation '${anim}'`;
     delete this.animations[anim];
+    if (queue && queue.length > 0) {
+      let next = queue[0];
+      queue = queue.slice(1, queue.length - 1);
+      setTimeout(() => this.startAnimation(anim, next), 200);
+    }
+    this.animationQueue[anim] = queue;
+    m.redraw();
   }
 }
 

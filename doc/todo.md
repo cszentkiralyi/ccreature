@@ -45,6 +45,7 @@
       - [ ] Elite
       - [ ] Rabble
     - [x] Draw & play AI
+    - [ ] Play animation
 - [ ] Game start
   - [ ] New game screen
   - [ ] Navigation menu

@@ -143,6 +143,36 @@ class Card {
 
     return card;
   }
+
+  static parse(s) {
+    let [titleLine, rarityString, ...affixStrings] = s.split('\n');
+    let titleTokens = titleLine.split(' ');
+    let title1, title2, title3, title4;
+    if (titleTokens.length > 4) {
+      [title1, title2, title3, ...title4] = titleTokens;
+      title4 = title4.join(' ');
+    } else if (titleTokens.length < 3) {
+      [title1, title2] = titleTokens;
+    } else {
+      throw 'Not implemented';
+    }
+    let titles = [title1, title2, title3, title4].filter(x => x);
+    
+    let rarity;
+    switch (titles.count) {
+      case 2: rarity = R.MAGIC; break;
+      case 3:
+      case 4: rarity = R.RARE; break;
+      default: rarity = R.COMMON; break;
+    }
+
+    let affixes = affixStrings.map((astr, i) => {
+      let spec = Affix.parse(astr);
+      return new Affix((i > 1 ? AP.SUFFIX : AP.PREFIX), [titles[i],titles[i]], spec);
+    });
+
+    return new Card({ rarity, affixes, mana: 1 });
+  }
 }
 
 export default Card;

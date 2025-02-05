@@ -4,7 +4,7 @@
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#FFFFFF",
-  "orientation": "portrait",
+  "orientation": "landscape",
   "icons": [
     {
       "src": "./assets/icon.svg",
