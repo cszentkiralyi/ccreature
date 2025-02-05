@@ -26,12 +26,12 @@
 ## Priority 1
 
 - [ ] Encounter UI
-  - [ ] Rendering
+  - [x] Rendering
     - [x] Card
     - [x] Deck
     - [x] Hand
     - [x] Discard pile
-    - [ ] Play area
+    - [x] Play area
     - [x] Resource globes
   - [x] Actions
     - [x] Draw card
@@ -43,14 +43,14 @@
       - [ ] Base
       - [ ] Boss
       - [ ] Elite
-      - [ ] Rabble
+      - [x] Rabble
     - [x] Draw & play AI
-    - [ ] Play animation
+    - [x] Play animation
 - [ ] Game start
   - [ ] New game screen
-  - [ ] Navigation menu
-    - [ ] Play (encounter)
-    - [ ] Collection
+  - [x] Navigation menu
+    - [x] Play (encounter)
+    - [x] Collection
 
 ## Priority 2
 

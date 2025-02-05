@@ -14,6 +14,7 @@ const PLAYER = new Archetypes.TheMeat();
 const ENEMY = Enemies.EnemyArchetype.create(Enemies.ENEMY_KIND.RABBLE, 1);
 
 class App {
+  route;
   _encounter;
   _profile;
 
@@ -21,8 +22,16 @@ class App {
     this._profile = new Profile(new Archetypes.TheMeat());
   }
 
+  oninit() {
+    this.route = m.route.get();
+  }
+
   view() {
-    let route = m.route.get();
+    let route = this.route || '';
+    try {
+      route = m.route.get();
+    } catch (ex) { /* we jumped the gun, do nothing lol */ }
+
     return (
       <div class="grid w-full h-full overflow-hidden"
         style={{ gridTemplateRows: '3rem 1fr' }}>
@@ -51,11 +60,16 @@ class NavigationBar {
     let { route } = attrs;
     return (
       <div class="flex bg-0 items-center justify-center gap-x-4 py-2">
-        <m.route.Link href="/lab">Lab</m.route.Link>
-        |
-        <m.route.Link href="/encounter">Encounter</m.route.Link>
+        {this.link(route, '/lab', 'Lab')} |
+        {this.link(route, '/encounter', 'Encounter')}
       </div>
     );
+  }
+
+  link(route, path, display) {
+    return route.startsWith(path)
+      ? <strong>{display}</strong>
+      : <m.route.Link href={path}>{display}</m.route.Link>
   }
 }
 
