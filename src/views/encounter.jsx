@@ -102,7 +102,6 @@ class EncounterScreen {
   }
 
   animate(event, args) {
-    console.log('animate', event, args);
     switch (event) {
       case 'enemy-play-card':
         this.queueAnimation('play-card', { card: args.card, source: 'enemy' });

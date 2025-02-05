@@ -172,8 +172,10 @@ class Encounter {
     this._enemy = enemy;
 
     let loopCycle = [
+      ES.PLAYER_TURN,
       ES.PLAYER_DRAW,
       ...(new Array(this.entities.player.speed)).fill(ES.PLAYER_PLAY),
+      ES.ENEMY_TURN,
       ES.ENEMY_DRAW,
       ...(new Array(this.entities.enemy.speed)).fill(ES.ENEMY_PLAY)
     ];
@@ -198,8 +200,15 @@ class Encounter {
       case ES.BEGIN:
         this.beginEncounter();
         break;
-      case ES.DISCARD:
+      case ES.PLAYER_DRAW:
+        this.gameEvent('player-draw-card');
+        break;
+      case ES.PLAYER_DISCARD:
         if (this.entities.player.hand.length == 0) this.nextGameState();
+        break;
+      case ES.PLAYER_TURN:
+      case ES.ENEMY_TURN:
+        this.beginTurn(state == ES.PLAYER_TURN ? CS.PLAYER : CS.ENEMY);
         break;
       case ES.ENEMY_DRAW:
       case ES.ENEMY_PLAY:
@@ -306,9 +315,12 @@ class Encounter {
     let target;
     if (method == CM.DRAW) {
       if (card.affixes.some(a => a.action === AA.AUTOPLAY)) {
-        let event = (source == CS.PLAYER ? 'player-' : 'enemy-') + 'play-card';
+        let evtPrefix = source == CS.PLAYER ? 'player-' : 'enemy-';
+        let playEvt = evtPrefix + 'play-card';
+        let drawEvt = evtPrefix + 'draw-card';
         this.delay(() => {
-          this.gameEvent(event, { card: card, force: true });
+          this.gameEvent(playEvt, { card: card, force: true });
+          window.setTimeout(() => this.gameEvent(drawEvt), 200);
           this.redraw();
         }, 750);
       }
@@ -342,6 +354,15 @@ class Encounter {
     for (var i = 0; i < 3; i++) {
       this.entities.player.drawCard();
     }
+  }
+
+  beginTurn(side) {
+    let target = side == CS.PLAYER ? this.entities.player : this.entities.enemy;
+    target.applyRestore(1, RES.MANA);
+    window.setTimeout(() => {
+      this.nextGameState();
+      this.redraw();
+    }, 200);
   }
 
   delay(f, t) {

@@ -31,9 +31,11 @@ const Constants = {
 
   ENCOUNTER_STATE: gen_enum([
     'BEGIN',
+    'PLAYER_TURN',
     'PLAYER_DRAW',
     'PLAYER_PLAY',
     'PLAYER_DISCARD',
+    'ENEMY_TURN',
     'ENEMY_DRAW',
     'ENEMY_PLAY',
     'ENEMY_DISCARD',
