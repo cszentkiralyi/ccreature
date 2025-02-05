@@ -202,7 +202,6 @@ class EncounterHand {
             style={{
               height: Card.HEIGHT,
               width: Card.WIDTH,
-              fontSize: '75%',
               zIndex: hov ? 999 : i,
               top: `-${(cardTop(i) + (hov ? EncounterHand.CARD_RAISE_REM : 0)).toFixed(2)}rem`,
               bottom: 0,

@@ -21,6 +21,7 @@ class Card {
     return (
       <div class={`grid rounded bg-white border border-color-card ${(attrs.shadow) || 'shadow'} cursor-default noselect`}
         style={{
+          fontSize: '65%',
           gridTemplateRows: '15% 1fr 1rem',
           borderWidth: '2px',
           height: attrs.height || Card.HEIGHT,
