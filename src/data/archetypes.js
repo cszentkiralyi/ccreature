@@ -67,15 +67,18 @@ class TheMeat extends Archetype {
     this._levelBonus.deckSize = { min: -0.25, max: 0.5 };
 
     this.deck = [
-      ...(new Array(8)).fill(Card.parse(`Strike
-        Common
-        Attack 3 Physical`)),
-      ...(new Array(2)).fill(Card.parse(`Analyze
-        Common
-        Restore 4 Mana`)),
-      ...(new Array(2)).fill(Card.parse(`Train
-        Common
-        Restore 2 Life`)),
+      { count: 8,
+        card: Card.parse(`Strike
+          Common
+          Attack 3 Physical`) },
+      { count: 2,
+        card: Card.parse(`Analyze
+          Common
+          Restore 4 Mana`) },
+      { count: 2,
+        card: Card.parse(`Train
+          Common
+          Restore 2 Life`)}
     ];
   }
 }

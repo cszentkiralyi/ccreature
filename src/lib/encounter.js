@@ -47,8 +47,13 @@ class EncounterDeck {
   _discard;
 
   constructor(cards) {
-    this._cards = cards;
-    this._draw = Util.shuffle(cards);
+    let i;
+    let deck = cards.reduce((d, { card, count }) => {
+      for (i = 0; i < count; i++) d.push(card);
+      return d;
+    }, []);
+    this._cards = deck;
+    this._draw = Util.shuffle(deck);
     this._discard = [];
   }
 

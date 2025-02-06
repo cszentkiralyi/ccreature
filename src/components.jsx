@@ -11,15 +11,14 @@ import EncounterScreen from './views/encounter.jsx';
 import LabScreen from './views/lab.jsx';
 
 const PLAYER = new Archetypes.TheMeat();
+const PROFILE = new Profile(PLAYER);
 const ENEMY = Enemies.EnemyArchetype.create(Enemies.ENEMY_KIND.RABBLE, 1);
 
 class App {
   route;
   _encounter;
-  _profile;
 
   constructor() {
-    this._profile = new Profile(new Archetypes.TheMeat());
   }
 
   oninit() {
@@ -44,13 +43,13 @@ class App {
   renderRoute(route) {
     if (route.startsWith('/encounter')) {
       this._encounter = this._encounter || new Encounter({
-        player: this._profile,
+        player: PROFILE,
         enemy: ENEMY,
         redraw: () => m.redraw()
       });
       return (<EncounterScreen encounter={this._encounter} />);
     } else if (route.startsWith('/lab')) {
-      return (<LabScreen player={this._profile} />);
+      return (<LabScreen player={PROFILE} />);
     }
   }
 }

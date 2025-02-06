@@ -13,6 +13,8 @@ class Card {
   rarity;
   mana;
 
+  _hash;
+
   constructor({ rarity, ...opts }) {
     this.rarity = rarity;
     this.affixes = (opts && opts.affixes) || [];
@@ -22,6 +24,7 @@ class Card {
   addAffix(affix) {
     if (this.affixes.length === Card.AFFIX_LIMIT) return false;
     this.affixes.push(affix);
+    this._hash = null;
     return true;
   }
 
@@ -36,6 +39,7 @@ class Card {
 
     if (next !== affixes) {
       this.affixes = next;
+      this._hash = null;
       return true
     }
 
@@ -64,25 +68,8 @@ class Card {
   }
 
   get title() {
-    let [prefixes, suffixes] =
-      this.affixes.reduce(([p, s], a) => {
-        if (a.position === AP.PREFIX) {
-          p = p.concat([a]);
-        } else {
-          s = s.concat([a]);
-        }
-        return [p, s];
-      }, [[],[]]);
-    prefixes = prefixes.sort((a, b) => Card.sortAffix(this.affixes, a, b));
-    suffixes = suffixes.sort((a, b) => Card.sortAffix(this.affixes, a, b));
-
-    /*
-         P: Strike
-        PP: Warrior's Strike
-        PS: Strike of Calm
-       PPS: Warrior's Strike of Calm
-      PPSS: Warrior's Strike of Calm Resolve
-    */
+    let prefixes = this.prefixes.sort((a, b) => Card.sortAffix(this.affixes, a, b));
+    let suffixes = this.suffixes.sort((a, b) => Card.sortAffix(this.affixes, a, b));
 
     let t = '';
     if (prefixes.length == 2) t = prefixes[1].titles[0] + ' ';
@@ -93,6 +80,20 @@ class Card {
       t += suffixes.reverse().map((s, i) => s.titles[i]).reverse().join(' ')
     }
     return t.trim();
+  }
+
+  get hash() {
+    if (this._hash) return this._hash;
+    // TODO: replace with literally anything better
+    let hashAffix = (a) => `${a.action}!${a.magnitude || 0}!${(this.data || 'null').toString()}`;
+    let h = [
+      this.rarity,
+      this.mana,
+      ...this.prefixes.map(hashAffix),
+      ...this.suffixes.map(hashAffix)
+    ];
+    this._hash = h.join('!');
+    return this._hash;
   }
 
   static sortAffix(affixes, a, b) {

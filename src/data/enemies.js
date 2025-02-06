@@ -57,12 +57,14 @@ class EnemyRabble extends EnemyArchetype {
     super(level);
 
     this.deck = [
-      ...(new Array(8)).fill(Card.parse(`Fear
-        Common
-        Attack 2 Physical`)),
-      ...(new Array(4)).fill(Card.parse(`Recover
-        Common
-        Restore 4 Mana`))
+      { count: 8,
+        card: Card.parse(`Fear
+          Common
+          Attack 2 Physical`) },
+      { count: 2,
+        card: Card.parse(`Recover
+          Common
+          Restore 4 Mana`) }
     ];
   }
 

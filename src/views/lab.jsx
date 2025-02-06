@@ -4,6 +4,7 @@ import Constants from '../lib/constants.js';
 import Util from '../lib/util.js';
 
 import Card from './card.jsx';
+import Profile from '../data/profile.js';
 
 const VIEWS = Constants.gen_enum(['COLLECTION', 'DECKS']);
 
@@ -48,24 +49,16 @@ class LabScreen {
   renderCurrentView(attrs) {
     switch (this.currentView) {
       case VIEWS.COLLECTION:
-        return this.renderCollectionView(attrs);
+        return (<CardCollectionView cards={attrs.player.collection.cards} />);
       case VIEWS.DECKS:
-        return this.renderDeckView(attrs);
+        return (<DeckEditorView player={attrs.player} />);
       default:
         return (<div>Unknown view "{this.currentView}"</div>);
     }
   }
-
-  renderCollectionView(attrs) {
-    return (<CardCollection cards={attrs.player.collection.cards} />);
-  }
-
-  renderDeckView(attrs) {
-    return (<DeckEditor player={attrs.player} />);
-  }
 }
 
-class CardCollection {
+class CardCollectionView {
   static CARDS_PER_COL = 5;
 
   view({ attrs }) {
@@ -74,45 +67,50 @@ class CardCollection {
       <div class="h-full w-full overflow-auto">
         <div class="grid gap-x-2 gap-y-8"
           style={{
-             gridTemplateColumns: `repeat(${attrs.columns || CardCollection.CARDS_PER_COL}, 1fr)`,
+             gridTemplateColumns: `repeat(${attrs.columns || CardCollectionView.CARDS_PER_COL}, 1fr)`,
              gridAutoFlow: 'row'
           }}>
-          {cards.map(c => (<Card card={c} onclick={() => attrs.oncardclick(c)} />))}
+          {cards.map(({ card, count }) => (
+            <div class="w-full h-full flex flex-col gap-y-2 items-center justify-center">
+              <Card card={card} onclick={() => attrs.oncardclick(card)} />
+              <div class="text-sm">x{count}</div>
+            </div>
+          ))}
         </div>
       </div>
     );
   }
 }
 
-class DeckEditor {
-  currentDeck = null;
+class DeckEditorView {
+  current = null;
 
   view({ attrs }) {
-    let vw = this.currentDeck ? this.renderEditor(attrs.player) : this.renderDecks(attrs.player);
+    let vw = this.current ? this.renderEditor(attrs.player) : this.renderDecks(attrs.player);
     return (<div class="h-full w-full">{vw}</div>);
   }
 
   renderEditor(player) {
-    let deck = this.currentDeck;
+    let deck = this.current;
     return (
       <div class="h-full w-full grid"
         style={{ gridTemplateColumns: '1fr 20% '}}>
-          <CardCollection cards={player.collection.cards}
+          <CardCollectionView cards={player.collection.cards}
             columns={4}
-            oncardclick={(c) => this.addCardToDeck(c)} />
+            oncardclick={(c) => this.current.cards.addCard(c)} />
           <div class="border-l border-color-0 grid gap-y-4" style={{ gridTemplateRows: '80% 20%' }}>
             <div class="gap-y-4 overflow-auto">
-              {deck.cards.map(c => {
+              {deck.cards.cards.map(({ card, count }) => {
                 return (
-                  <div class="cursor-pointer p-2" onclick={() => this.removeCardFromDeck(c)}>
-                    {c.title}
+                  <div class="cursor-pointer p-2" onclick={() => this.current.cards.removeCard(card)}>
+                    {count}x {card.title}
                   </div>
                 );
               })}
             </div>
-            <div class="flex flex-col gap-y-8 h-full items-end">
+            <div class="flex flex-col py-8 gap-y-8 h-full">
               <div><button onclick={() => this.discardDeck()}>Discard changes</button></div>
-              <div><button onclick={() => this.saveDeck(player.collection.decks)}>Save</button></div>
+              <div><button onclick={() => this.saveDeck(player.collection)}>Save</button></div>
             </div>
           </div>
       </div>
@@ -120,19 +118,15 @@ class DeckEditor {
   }
 
   addCardToDeck(card) {
-    this.currentDeck.cards.push(card);
-  }
-  removeCardFromDeck(card) {
-    let i = this.currentDeck.cards.indexOf(card);
-    if (i > -1) this.currentDeck.cards.splice(i, 1);
+    this.current.cards.addCard(card);
   }
 
-  saveDeck(decks) {
-    decks[this.currentDeck.label] = this.currentDeck;
+  saveDeck(collection) {
+    collection.setDeck(this.current.label, this.current.cards.cards);
     this.discardDeck();
   }
   discardDeck() {
-    this.currentDeck = null;
+    this.current = null;
   }
 
   renderDecks(player) {
@@ -140,18 +134,19 @@ class DeckEditor {
       <div class="h-full w-full overflow-auto">
         <div class="grid gap-x-2 gap-y-8"
           style={{
-             gridTemplateColumns: `repeat(${CardCollection.CARDS_PER_COL}, 1fr)`,
+             gridTemplateColumns: `repeat(${CardCollectionView.CARDS_PER_COL}, 1fr)`,
              gridAutoFlow: 'row'
           }}>
           {
-            Object.keys(player.collection.decks).sort().map(deckName => {
+            player.collection.decks.sort().map(deckName => {
               return (
                 <div class="flex flex-col h-full items-center justify-center cursor-pointer"
                   onclick={() => {
-                    this.currentDeck = {
-                       label: deckName,
-                       cards: [...player.collection.decks[deckName].cards]
-                    };
+                    let cards = player.collection.getDeck(deckName).cards;
+                    this.current = {
+                      label: deckName,
+                      cards: new Profile.CardCollection(cards)
+                     };
                   }}>
                   <Card facedown={true} />
                   <div class="flex items-center">{deckName}</div>
