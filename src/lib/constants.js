@@ -1,13 +1,21 @@
-const gen_enum = (vs, target) => {
+const gen_enum = (vs, target, getEnumValue) => {
+  let enumV = getEnumValue || ((i) => i);
   let ret = target || {};
-  for (var i = 0; i < vs.length; i++) {
-    ret[vs[i]] = i;
-  }
   let byVal = ret.byVal || {};
-  vs.forEach(v => byVal[ret[v]] = v);
+  let i, e, v;
+  for (i = 0; i < vs.length; i++) {
+    v = vs[i];
+    e = enumV(i);
+    ret[v] = e;
+    byVal[e] = v;
+  }
   ret.byVal = byVal;
   return ret;
 }
+
+/** Return a true bitflag enum so you can do stuff like (ENUM.A | ENUM.B)
+ *  to represent both A and B simultaneously, and check via (v & ENUM.A) */
+const gen_bit_enum = (vs, target) => gen_enum(vs, target, (i) => Math.pow(2, i));
 
 const Constants = {
   AFFIX_ACTION: gen_enum([

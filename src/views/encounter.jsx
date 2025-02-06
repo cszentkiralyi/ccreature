@@ -198,7 +198,7 @@ class EncounterHand {
             onclick = () => this.selected = i;
           }
 
-          return (<div class="absolute"
+          return (<div class="absolute cursor-pointer"
             style={{
               height: Card.HEIGHT,
               width: Card.WIDTH,

@@ -19,7 +19,7 @@ class Card {
     let onmenter = attrs.onhoverstart || ((e) => null);
     let onmleave = attrs.onhoverend || ((e) => null);
     return (
-      <div class={`grid rounded bg-white border border-color-card ${(attrs.shadow) || 'shadow'} cursor-default noselect`}
+      <div class={`grid rounded bg-white border border-color-card ${(attrs.shadow) || 'shadow'} noselect`}
         style={{
           fontSize: '65%',
           gridTemplateRows: '15% 1fr 1rem',
@@ -47,7 +47,7 @@ class Card {
 
   view_facedown({ attrs }) {
     return (
-      <div class="rounded bg-card-back border border-color-card shadow cursor-default noselect"
+      <div class="rounded bg-card-back border border-color-card shadow noselect"
         style={{
           height: attrs.height || Card.HEIGHT,
           width: attrs.width || Card.WIDTH

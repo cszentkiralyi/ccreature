@@ -50,7 +50,7 @@ class App {
       });
       return (<EncounterScreen encounter={this._encounter} />);
     } else if (route.startsWith('/lab')) {
-      return (<LabScreen player={PLAYER} />);
+      return (<LabScreen player={this._profile} />);
     }
   }
 }
@@ -59,7 +59,7 @@ class NavigationBar {
   view({ attrs }) {
     let { route } = attrs;
     return (
-      <div class="flex bg-0 items-center justify-center gap-x-4 py-2">
+      <div class="flex bg-0 border-b border-color-1 shadow items-center justify-center gap-x-4 py-2">
         {this.link(route, '/lab', 'Lab')} |
         {this.link(route, '/encounter', 'Encounter')}
       </div>
