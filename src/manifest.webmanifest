@@ -1,5 +1,5 @@
 {
-  "name": "Caiman",
+  "name": "CCREATURE",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#000000",
@@ -7,9 +7,9 @@
   "orientation": "landscape",
   "icons": [
     {
-      "src": "./assets/icon.svg",
+      "src": "./assets/icon.png",
       "sizes": "48x48 72x72 96x96 128x128 256x256",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

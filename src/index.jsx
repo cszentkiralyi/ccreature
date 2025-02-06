@@ -7,4 +7,4 @@ m.route(root, '/lab', {
   '/lab': App,
   '/encounter': App
 });
-m.mount(root, App);
+//m.mount(root, App);
