@@ -89,6 +89,12 @@ const square = (x, intercept, steepness) => {
   return Math.pow(steepness * x / intercept, 2);
 }
 
+const cube = (x, intercept, steepness) => {
+  intercept = intercept || 1;
+  steepness = steepness || 1;
+  return Math.pow(steepness * x / intercept, 3);
+}
+
 export default {
   captialize,
   shuffle,

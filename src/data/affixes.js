@@ -26,7 +26,7 @@ const GEN_AFFIX_FAMILY = ({ base, scaling, titles }) => {
       attrs.titles = titles[i];
       if ('spec' in scaling) {
         attrs.spec = attrs.spec || {};
-        scale(attrs.spec, scaling.spec, Util.square(pct));
+        scale(attrs.spec, scaling.spec, Util.cube(pct));
         delete scaling['spec'];
       }
       scale(attrs, scaling, pct, Util.square(pct));
