@@ -155,6 +155,10 @@ body {
   --shadow-color: rgba(0, 0, 255, 0.5);
   animation: 0.5s linear 0s infinite alternate pulse-shadow;
 }
+.glow-gold {
+  --shadow-color: rgba(255, 215, 0, 0.5);
+  animation: 0.5s linear 0s infinite alternate pulse-shadow;
+}
 
 .pointer-events-none { pointer-events: none; }
 .pointer-events-auto { pointer-events: auto; }

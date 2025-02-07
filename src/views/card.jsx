@@ -47,7 +47,7 @@ class Card {
 
   view_facedown({ attrs }) {
     return (
-      <div class="rounded bg-card-back border border-color-card shadow noselect"
+      <div class={`rounded bg-card-back border border-color-card ${attrs.shadow || 'shadow'} noselect`}
         style={{
           height: attrs.height || Card.HEIGHT,
           width: attrs.width || Card.WIDTH

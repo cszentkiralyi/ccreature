@@ -137,10 +137,21 @@ class DeckEditorView {
              gridTemplateColumns: `repeat(${CardCollectionView.CARDS_PER_COL}, 1fr)`,
              gridAutoFlow: 'row'
           }}>
+          <div class="flex flex-col h-full items-center cursor-pointer"
+            onclick={() => {
+              this.current = {
+                label: window.prompt('Deck label'),
+                cards: new Profile.CardCollection()
+              };
+            }}>
+            <Card facedown={true} />
+            <div class="flex items-center">+ Add New</div>
+          </div>
           {
             player.collection.decks.sort().map(deckName => {
+              let cur = deckName == player.currentDeck;
               return (
-                <div class="flex flex-col h-full items-center justify-center cursor-pointer"
+                <div class="flex flex-col h-full items-center cursor-pointer"
                   onclick={() => {
                     let cards = player.collection.getDeck(deckName).cards;
                     this.current = {
@@ -148,8 +159,17 @@ class DeckEditorView {
                       cards: new Profile.CardCollection(cards)
                      };
                   }}>
-                  <Card facedown={true} />
+                  <Card facedown={true} shadow={cur ? 'glow-gold' : null} />
                   <div class="flex items-center">{deckName}</div>
+                  {
+                    !cur
+                    ? (
+                      <div class="flex items-center opacity-60"
+                        onclick={(e) => { e.stopPropagation(); player.currentDeck = deckName; }}>
+                        Make active
+                      </div>
+                    ) : null
+                  }
                 </div>
               );
             })

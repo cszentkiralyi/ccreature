@@ -181,10 +181,10 @@ class Encounter {
     let loopCycle = [
       ES.PLAYER_TURN,
       ES.PLAYER_DRAW,
-      ...(new Array(this.entities.player.speed)).fill(ES.PLAYER_PLAY),
+      ...Util.genArray(this.entities.player.speed, () => ES.PLAYER_PLAY),
       ES.ENEMY_TURN,
       ES.ENEMY_DRAW,
-      ...(new Array(this.entities.enemy.speed)).fill(ES.ENEMY_PLAY)
+      ...Util.genArray(this.entities.enemy.speed, () => ES.ENEMY_PLAY)
     ];
 
     this.gameLoop = new GameLoop(loopCycle, ES.BEGIN, (s) => this.handleGameState(s));
