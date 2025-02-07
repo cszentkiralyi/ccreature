@@ -29,7 +29,7 @@ const GEN_AFFIX_FAMILY = ({ base, scaling, titles }) => {
         scale(attrs.spec, scaling.spec, Util.cube(pct));
         delete scaling['spec'];
       }
-      scale(attrs, scaling, pct, Util.square(pct));
+      scale(attrs, scaling, pct, Util.cube(pct));
     }
     affixes.push(attrs)
   }
