@@ -70,6 +70,7 @@ class EncounterScreen {
           <EncounterHand
             hand={encounter.entities.player.hand}
             onselect={onHandSelect}
+            doubleclick={false}
             glow={handGlow}
           />
         </div>
@@ -199,7 +200,7 @@ class EncounterHand {
           let sel = this.selected == i;
           let hov = sel || (this.hovered == i && this.selected == null);
           let onclick;
-          if (sel) {
+          if (sel || !attrs.doubleclick) {
             onclick = () => { this.selected = null; attrs.onselect(card) };
           } else if (this.selected != null) {
             onclick = () => this.selected = null;
