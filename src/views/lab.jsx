@@ -6,13 +6,13 @@ import Util from '../lib/util.js';
 import Card from './card.jsx';
 import Profile from '../lib/profile.js';
 
-const VIEWS = Constants.gen_enum(['COLLECTION', 'DECKS']);
+const VIEWS = Constants.gen_enum(['PLAY', 'COLLECTION', 'DECKS']);
 
 class LabScreen {
   currentView;
 
   constructor() {
-    this.currentView = VIEWS.COLLECTION;
+    this.currentView = VIEWS.PLAY;
   }
 
   view({ attrs }) {
@@ -23,12 +23,13 @@ class LabScreen {
         style={{
           gridTemplateColumns: '10rem 1fr'
         }}>
-          <div class="h-full flex flex-col border-r border-color-1 shadow">
+          <div class="h-full flex flex-col border-r border-color-1 shadow p-8 gap-y-8">
             {
               Object.values(VIEWS).filter(v => typeof v === 'number').map(v => {
                 let cur = this.currentView == v;
                 return (
-                  <div class="p-2 cursor-pointer" onclick={() => this.changeView(v)}>
+                  <div class={`p-2 cursor-pointer ${cur ? 'font-weight-bold' : ''}`}
+                    onclick={() => this.changeView(v)}>
                     <span>{Util.captialize(VIEWS.byVal[v])}</span>
                   </div>
                 );
@@ -48,6 +49,8 @@ class LabScreen {
 
   renderCurrentView(attrs) {
     switch (this.currentView) {
+      case VIEWS.PLAY:
+        return (<PlayView start={attrs.startEncounter} continue={attrs.continueEncounter} />);
       case VIEWS.COLLECTION:
         return (<CardCollectionView cards={attrs.player.collection.cards} />);
       case VIEWS.DECKS:
@@ -55,6 +58,25 @@ class LabScreen {
       default:
         return (<div>Unknown view "{this.currentView}"</div>);
     }
+  }
+}
+
+class PlayView {
+  view({ attrs }) {
+    return (
+      <div class="w-full h-full flex items-center justify-center gap-y-8">
+        <div class="flex flex-col gap-y-8" style={{ marginTop: '-25%' }}>
+          <button class="p-8 text-xl" onclick={attrs.start}>
+            Play
+          </button>
+          {
+            attrs.continueEncounter
+              ? (<button class="p-4" onclick={attrs.continue}>Continue</button>)
+              : null
+          }
+        </div>
+      </div>
+    );
   }
 }
 
@@ -71,9 +93,11 @@ class CardCollectionView {
              gridAutoFlow: 'row'
           }}>
           {cards.map(({ card, count }) => (
-            <div class="w-full h-full flex flex-col gap-y-2 items-center justify-center">
-              <Card card={card} onclick={() => attrs.oncardclick(card)} />
-              <div class="text-sm">x{count}</div>
+            <div class="w-full h-full flex items-center justify-center">
+              <div class="flex-col gap-y-2 cursor-pointer">
+                <Card card={card} onclick={() => attrs.oncardclick(card)} />
+                <div class="text-sm text-center">x{count}</div>
+              </div>
             </div>
           ))}
         </div>
@@ -86,18 +110,18 @@ class DeckEditorView {
   current = null;
 
   view({ attrs }) {
-    let vw = this.current ? this.renderEditor(attrs.player) : this.renderDecks(attrs.player);
+    let vw = this.current ? this.renderEditor(attrs) : this.renderDecks(attrs);
     return (<div class="h-full w-full">{vw}</div>);
   }
 
-  renderEditor(player) {
+  renderEditor({ player }) {
     let deck = this.current;
     return (
       <div class="h-full w-full grid"
         style={{ gridTemplateColumns: '1fr 20% '}}>
           <CardCollectionView cards={player.collection.cards}
             columns={4}
-            oncardclick={(c) => this.current.cards.addCard(c)} />
+            oncardclick={(c) => this.tryAddCard(c, player.collection)} />
           <div class="border-l border-color-0 grid gap-y-4" style={{ gridTemplateRows: '80% 20%' }}>
             <div class="gap-y-4 overflow-auto">
               {deck.cards.cards.map(({ card, count }) => {
@@ -109,16 +133,20 @@ class DeckEditorView {
               })}
             </div>
             <div class="flex flex-col py-8 gap-y-8 h-full">
-              <div><button onclick={() => this.discardDeck()}>Discard changes</button></div>
-              <div><button onclick={() => this.saveDeck(player.collection)}>Save</button></div>
+              <button class="w-full py-8" onclick={() => this.saveDeck(player.collection)}>Save</button>
+              <div class="text-center py-8">
+                <button onclick={() => this.discardDeck()}>Discard changes</button>
+              </div>
             </div>
           </div>
       </div>
     );
   }
 
-  addCardToDeck(card) {
-    this.current.cards.addCard(card);
+  tryAddCard(card, collection) {
+    if (this.current.cards.cardCount(card) < collection.cardCount(card)) {
+      this.current.cards.addCard(card);
+    }
   }
 
   saveDeck(collection) {
@@ -129,7 +157,7 @@ class DeckEditorView {
     this.current = null;
   }
 
-  renderDecks(player) {
+  renderDecks({ player }) {
     return (
       <div class="h-full w-full overflow-auto">
         <div class="grid gap-x-2 gap-y-8"

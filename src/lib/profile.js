@@ -54,6 +54,11 @@ class CardCollection {
     return ret;
   }
 
+  cardCount(card) {
+    if (!card) return Object.values(this._countsbyHash).reduce((m, n) => n + m);
+    return this._countByHash[typeof card === 'string' ? card : card.hash];
+  }
+
   setDeck(label, cards) {
     this._decks[label] = cards.map(({ card, count }) => {
       let h;

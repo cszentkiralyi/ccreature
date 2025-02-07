@@ -43,39 +43,49 @@ class App {
 
   renderRoute(route) {
     if (route.startsWith('/encounter')) {
-      this._encounter = this._encounter || new Encounter({
-        player: PROFILE,
-        enemy: ENEMY,
-        end: {
-          win: () => {
-            let loot = ENEMY.getLoot();
-            PROFILE.collection.addCards(loot.map(c => ({ card: c, count: 1 })))
-            this._encounter = null;
-            m.route.set('/lab');
-          },
-          lose: () => {
-            this._encounter = null;
-            m.route.set('/lab');
-          }
-        },
-        redraw: () => m.redraw()
-      });
       return (<EncounterScreen encounter={this._encounter} />);
     } else if (route.startsWith('/lab')) {
-      return (<LabScreen player={PROFILE} />);
+      if (this._encounter
+          && [Constants.ENCOUNTER_STATE.PLAYER_WIN,
+              Constants.ENCOUNTER_STATE.PLAYER_LOSE].includes(this._encounter.gameState))
+        this._encounter = null;
+      return (<LabScreen player={PROFILE}
+                startEncounter={() => this.startEncounter()}
+                continueEncounter={() => m.route.set('/encounter')} />);
     } else if (route.startsWith('/dev-tools')) {
       return (<DevToolsScreen player={PROFILE} />);
     }
   }
+
+  startEncounter() {
+    this._encounter = new Encounter({
+      player: PROFILE,
+      enemy: ENEMY,
+      end: {
+        win: () => {
+          let loot = ENEMY.getLoot();
+          PROFILE.collection.addCards(loot.map(c => ({ card: c, count: 1 })))
+        },
+        lose: () => {
+        }
+      },
+      redraw: () => m.redraw()
+    });
+
+    m.route.set('/encounter');
+  };
 }
+
 
 class NavigationBar {
   view({ attrs }) {
     let { route } = attrs;
     return (
-      <div class="flex bg-0 border-b border-color-1 shadow items-center justify-center gap-x-4 py-2">
+      <div class="flex relative bg-0 border-b border-color-1 items-center shadow px-8 gap-x-8">
+        <div class="flex-grow" />
         {this.link(route, '/lab', 'Lab')} |
-        {this.link(route, '/encounter', 'Encounter')}
+        {this.link(route, '/Encounter', 'Encounter')}
+        <div class="flex-grow" />
       </div>
     );
   }

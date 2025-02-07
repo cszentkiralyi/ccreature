@@ -39,6 +39,7 @@ class EncounterScreen {
         }}>
         <div>
           { this.renderAnimations() }
+          { this.renderOverlay() }
         </div>
         <div class="">
           <EncounterHealthbar entity={encounter.entities.enemy} />
@@ -111,6 +112,34 @@ class EncounterScreen {
     )
   }
 
+  renderOverlay() {
+    let overlayWidth = 40; // rem
+    let overlayHeight = 20
+    if (!this.overlay) return;
+    return (
+      <div class="absolute inset-0">
+        <div class="relative h-full w-full">
+          <div class="absolute inset-0 bg-black opacity-20" style={{ zIndex: 998 }}></div>
+          <div class="absolute bg-white shadow border border-color-1 flex flex-col items-center justify-center"
+           style={{
+             width: `${overlayWidth}rem`,
+             height: `${overlayHeight}rem`,
+             top: `calc(50% - ${(overlayHeight / 2).toFixed(2)}rem)`,
+             left: `calc(50% - ${(overlayWidth / 2).toFixed(2)}rem)`,
+             zIndex: 999
+           }}>
+            <div style={{ paddingBottom: '4rem' }}>{this.overlay.message}</div>
+            <div class="flex items-center">
+              <button onclick={this.overlay.perform}>
+                {this.overlay.action}
+              </button>
+            </div>
+           </div>
+        </div>
+      </div>
+    );
+  }
+
   animate(event, args) {
     switch (event) {
       case 'enemy-play-card':
@@ -121,6 +150,14 @@ class EncounterScreen {
         break;
       case 'player-draw-card':
         this.queueAnimation('draw-card', true);
+        break;
+      case 'player-win':
+      case 'player-lose':
+        this.overlay = {
+          message: (event === 'player-win') ? 'Win.' : 'Lose.',
+          action: 'to the lab',
+          perform: () => m.route.set('/lab')
+        };
         break;
     }
   }

@@ -19,7 +19,7 @@ class EnemyArchetype {
     resource: { life: 1, mana: 1 }
   };
 
-  _loot = [
+  _lootTable = [
     { cards: 0, weight: 1 }
   ];
 
@@ -29,10 +29,12 @@ class EnemyArchetype {
 
   takeTurn({ hand, life, mana, gameEvent }) { gameEvent('pass'); }
 
-  getLoot(bonus) {
+  getLoot(bonus, force) {
+    if (this._loot && !force) return this.loot;
     // TODO: care about the loot bonus, for now it's a placeholder
-    let roll = Util.wrng(this._loot);
-    return Util.genArray(roll.cards, () => Card.generate());
+    let roll = Util.wrng(this._lootTable);
+    this._loot = Util.genArray(roll.cards, () => Card.generate());
+    return this._loot
   }
 
   get life() {
@@ -67,7 +69,7 @@ class EnemyRabble extends EnemyArchetype {
     resource: { life: 1, mana: 1 }
   };
 
-  _loot = [
+  _lootTable = [
     { cards: 0, weight: 10 },
     { cards: 1, weight: 10 },
     { cards: 2, weight: 5 },

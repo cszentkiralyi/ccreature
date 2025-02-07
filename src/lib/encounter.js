@@ -201,6 +201,7 @@ class Encounter {
     if (this.entities.player.life == 0 || this.entities.enemy.life == 0) {
       let playerWin = this.entities.enemy.life == 0;
       this.gameLoop.setState(playerWin ? ES.PLAYER_WIN : ES.PLAYER_LOSE);
+      this.animate(playerWin ? 'player-win' : 'player-lose');
       this.end[playerWin ? 'win' : 'lose']();
       return;
     }
@@ -323,7 +324,7 @@ class Encounter {
         throw `Unknown game event! '${event}'`;
     }
 
-    if (animate) this.animate(event, args);
+    if (animate && this.animate) this.animate(event, args);
     this.redraw();
   }
 

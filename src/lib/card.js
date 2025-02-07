@@ -93,7 +93,9 @@ class Card {
   get hash() {
     if (this._hash) return this._hash;
     // TODO: replace with literally anything better
-    let hashAffix = (a) => `${a.action}!${a.magnitude || 0}!${(a.spec || 'null').toString()}`;
+    let hashAffix = (a) => {
+      return `${a.action}!${a.magnitude || 0}!${a.spec ? JSON.stringify(a.spec) : 'null'}`;
+    }
     let h = [
       this.rarity,
       this.mana,
