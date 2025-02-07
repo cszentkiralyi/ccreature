@@ -8,6 +8,7 @@ const RES = Constants.RESOURCE;
 
 const GEN_AFFIX_FAMILY = ({ base, scaling, titles }) => {
   let scale = (dest, src, pct) =>  {
+    let prop;
     for (prop in src) {
       let spec = src[prop];
       let v = Util.interp(spec.min, spec.max, pct);
@@ -44,7 +45,8 @@ let ALL_AFFIXES = [
       spec: { type: DMG.PHYSICAL },
       tags: ['physical', 'attack'],
       // TODO: exclude affix groups when generating
-      groups: 'physical attack'
+      groups: 'physical attack',
+      sortOrder: 1
     },
     scaling: {
       mana: { min: 1, max: 20 },
@@ -66,7 +68,8 @@ let ALL_AFFIXES = [
       action: AA.ATTACK,
       spec: { type: DMG.ELEMENTAL },
       tags: ['elemental', 'attack'],
-      group: 'elemental attack'
+      group: 'elemental attack',
+      sortOrder: 2
     },
     scaling: {
       mana: { min: 1, max: 20 },
@@ -88,7 +91,8 @@ let ALL_AFFIXES = [
       action: AA.SPELL,
       spec: { type: DMG.ELEMENTAL },
       tags: ['elemental', 'spell'],
-      group: 'elemental spell'
+      group: 'elemental spell',
+      sortOrder: 3
     },
     scaling: {
       mana: { min: 1, max: 20 },
@@ -110,7 +114,8 @@ let ALL_AFFIXES = [
       action: AA.SPELL,
       spec: { type: DMG.DARK },
       tags: ['dark', 'spell'],
-      group: 'dark spell'
+      group: 'dark spell',
+      sortOrder: 4
     },
     scaling: {
       mana: { min: 1, max: 20 },
@@ -133,6 +138,7 @@ let ALL_AFFIXES = [
       action: AA.AUTOPLAY,
       tags: [],
       group: 'autoplay',
+      sortOrder: 999,
       weight: 50
     },
     titles: [ ['of Flashing', 'Flash']]
@@ -144,7 +150,8 @@ let ALL_AFFIXES = [
       action: AA.RESTORE,
       spec: { resource: RES.LIFE },
       tags: [ 'life' ],
-      group: 'restore life'
+      group: 'restore life',
+      sortOrder: 700
     },
     scaling: {
       magnitude: { min: 3, max: 200 },
@@ -164,7 +171,8 @@ let ALL_AFFIXES = [
       action: AA.RESTORE,
       spec: { resource: RES.MANA },
       tags: [ 'mana' ],
-      group: 'restore mana'
+      group: 'restore mana',
+      sortOrder: 701
     },
     scaling: {
       magnitude: { min: 3, max: 200 },
@@ -183,7 +191,8 @@ let ALL_AFFIXES = [
       position: AP.SUFFIX,
       action: AA.DRAW,
       tags: [ ],
-      group: 'draw'
+      group: 'draw',
+      sortOrder: 998
     },
     scaling: {
       magnitude: { min: 1, max: 3 },
@@ -200,7 +209,8 @@ let ALL_AFFIXES = [
       position: AP.SUFFIX,
       action: AA.DISCARD,
       tags: [ ],
-      group: 'discard'
+      group: 'discard',
+      sortOrder: 997
     },
     scaling: {
       magnitude: { min: 1, max: 3 },

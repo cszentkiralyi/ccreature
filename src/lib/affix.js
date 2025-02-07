@@ -47,6 +47,7 @@ class Affix {
   static parseActionSpec(action, misc) {
     switch (action) {
       case AA.ATTACK:
+      case AA.SPELL:
         return {
           type: DMG[misc[0].toUpperCase()]
         }

@@ -40,7 +40,7 @@ class Card {
     }
 
     if (next !== affixes) {
-      this.affixes = next;
+      this.affixes = next.sort();
       this._invalidate();
       return true
     }
@@ -66,6 +66,8 @@ class Card {
   }
 
   get affixes() { return [...this.affixes]; }
+
+  set affixes(next) { this.affixes = next.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0) )};
 
   get prefixes() {
     return this.affixes.filter(a => a.position === AP.PREFIX);

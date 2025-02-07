@@ -63,7 +63,7 @@ class App {
       enemy: ENEMY,
       end: {
         win: () => {
-          let loot = ENEMY.getLoot();
+          let loot = ENEMY.getLoot(1, true);
           PROFILE.collection.addCards(loot.map(c => ({ card: c, count: 1 })))
         },
         lose: () => {

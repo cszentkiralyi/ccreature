@@ -85,6 +85,7 @@ class CardCollectionView {
 
   view({ attrs }) {
     let cards = attrs.cards;
+    let cardclick = attrs.oncardclick || ((c) => null);
     return (
       <div class="h-full w-full overflow-auto">
         <div class="grid gap-x-2 gap-y-8"
@@ -95,7 +96,7 @@ class CardCollectionView {
           {cards.map(({ card, count }) => (
             <div class="w-full h-full flex items-center justify-center">
               <div class="flex-col gap-y-2 cursor-pointer">
-                <Card card={card} onclick={() => attrs.oncardclick(card)} />
+                <Card card={card} onclick={() => cardclick(card)} />
                 <div class="text-sm text-center">x{count}</div>
               </div>
             </div>
