@@ -22,9 +22,9 @@ const GEN_AFFIX_FAMILY = ({ base, scaling, titles }) => {
     let pct = i / (tiers - 1);
     let attrs = { tier: i+1, ...base };
     if (tiers > 1 && scaling) {
+      attrs.titles = titles[i];
       if ('spec' in scaling) {
         attrs.spec = attrs.spec || {};
-        attrs.titles = titles[i];
         scale(attrs.spec, scaling.spec, Util.square(pct));
         delete scaling['spec'];
       }
@@ -36,7 +36,7 @@ const GEN_AFFIX_FAMILY = ({ base, scaling, titles }) => {
 };
 
 
-let __ALL_AFFIXES = [
+let ALL_AFFIXES = [
   ...GEN_AFFIX_FAMILY({
     base: {
       position: AP.PREFIX,
@@ -214,73 +214,6 @@ let __ALL_AFFIXES = [
   })
 
 ];
-
-const ALL_AFFIXES = [
-  {
-    position: AP.PREFIX,
-    titles: ['Warrior\'s', 'Blow'],
-    spec: { action: AA.ATTACK, magnitude: 10, spec: { damage: DMG.PHYSICAL } },
-    weight: 100,
-    group: 'offense'
-  },
-  {
-    position: AP.PREFIX,
-    titles: ['Thief\'s', 'Shock'],
-    spec: { action: AA.ATTACK, magnitude: 10, spec: { damage: DMG.ELEMENTAL } },
-    weight: 100,
-    group: 'offense'
-  },
-  {
-    position: AP.PREFIX,
-    titles: ['Adept\'s', 'Incision'],
-    spec: { action: AA.ATTACK, magnitude: 10, spec: { damage: DMG.DARK } },
-    weight: 100,
-    group: 'offense'
-  },
-
-  {
-    position: AP.PREFIX,
-    titles: ['Shaman\'s', 'Heal'],
-    spec: { action: AA.RESTORE, magnitude: 10, spec: { resource: RES.LIFE } },
-    weight: 50,
-    group: 'restore'
-  },
-
-
-  {
-    position: AP.SUFFIX,
-    titles: ['of Calm', 'Calming'],
-    spec: { action: AA.RESTORE, magnitude: 5, spec: { resource: RES.MANA } },
-    weight: 50,
-    group: 'restore'
-  },
-
-  {
-    position: AP.SUFFIX,
-    titles: ['of Flashing', 'Flash'],
-    spec: { action: AA.AUTOPLAY },
-    weight: 25,
-    group: 'buff'
-  },
-
-  {
-    position: AP.SUFFIX,
-    titles: ['of Skill', 'Skill'],
-    spec: { action: AA.DRAW, magnitude: 1 },
-    weight: 25,
-    group: 'buff'
-  },
-  {
-    position: AP.SUFFIX,
-    titles: ['of Fumbling', 'Fumble'],
-    spec: { action: AA.DISCARD, magnitude: 1 },
-    weight: 25,
-    group: 'buff'
-  }
-];
-
-const AFFIXES_BY_GROUP = Util.groupBy(ALL_AFFIXES, a => a.group);
-const AFFIXES_BY_POSITION = Util.groupBy(ALL_AFFIXES, a => a.position);
 
 export default {
   generateAffix: () => Util.wrng(ALL_AFFIXES),

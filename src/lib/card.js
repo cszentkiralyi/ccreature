@@ -14,6 +14,8 @@ class Card {
   mana;
 
   _hash;
+  _tags;
+  _groups;
 
   constructor({ rarity, ...opts }) {
     this.rarity = rarity;
@@ -24,7 +26,7 @@ class Card {
   addAffix(affix) {
     if (this.affixes.length === Card.AFFIX_LIMIT) return false;
     this.affixes.push(affix);
-    this._hash = null;
+    this._invalidate();
     return true;
   }
 
@@ -39,7 +41,7 @@ class Card {
 
     if (next !== affixes) {
       this.affixes = next;
-      this._hash = null;
+      this._invalidate();
       return true
     }
 
@@ -55,6 +57,12 @@ class Card {
     };
 
     return new Card(Object.assign(spec, changes));
+  }
+
+  _invalidate() {
+    this._hash = null;
+    this._tags = null;
+    this._groups = null;
   }
 
   get affixes() { return [...this.affixes]; }
@@ -85,15 +93,32 @@ class Card {
   get hash() {
     if (this._hash) return this._hash;
     // TODO: replace with literally anything better
-    let hashAffix = (a) => `${a.action}!${a.magnitude || 0}!${(this.spec || 'null').toString()}`;
+    let hashAffix = (a) => `${a.action}!${a.magnitude || 0}!${(a.spec || 'null').toString()}`;
     let h = [
       this.rarity,
       this.mana,
       ...this.prefixes.map(hashAffix),
       ...this.suffixes.map(hashAffix)
     ];
-    this._hash = h.join('!');
+    this._hash = h.join('!!');
     return this._hash;
+  }
+
+  get tags() {
+    if (this._tags) return this._tags;
+    let tags = new Set();
+    this.affixes.forEach(a => {
+      a.tags.forEach(t => tags.add(t));
+    });
+    this._tags = [...tags.values()];
+    return this._tags;
+  }
+
+  get groups() {
+    if (this._groups) return this._groups;
+    let groups = new Set(this.affixes.map(a => a.group));
+    this._groups = [...groups.values()];
+    return this._groups;
   }
 
   static sortAffix(affixes, a, b) {
@@ -129,15 +154,17 @@ class Card {
 
     let card = new Card({ rarity: rarity }), i;
     for (i = 0; i < affixCount; i++) {
-      let affixFilter = { inst: card.affixes };
+      let affixFilter = {
+        inst: card.affixes,
+        group: card.groups
+      };
       if (card.suffixes.length == 2) {
         affixFilter.position = [AP.SUFFIX];
       } else if (card.prefixes.length == 2) {
         affixFilter.position = [AP.PREFIX];
       }
       let affixData = AffixGen.generateAffixExcluding(affixFilter);
-      let affix = new Affix(affixData.position, affixData.titles, affixData.spec);
-      card.addAffix(affix);
+      card.addAffix(new Affix(affixData));
     }
 
     card.mana = 1;
@@ -163,7 +190,9 @@ class Card {
 
     let affixes = affixStrings.map((astr, i) => {
       let spec = Affix.parse(astr);
-      return new Affix((i > 1 ? AP.SUFFIX : AP.PREFIX), [titles[i],titles[i]], spec);
+      spec.position = i > 1 ? AP.SUFFIX : AP.PREFIX;
+      spec.titles = [titles[i], titles[i]];
+      return new Affix(spec);
     });
 
     return new Card({ rarity, affixes, mana: 1 });

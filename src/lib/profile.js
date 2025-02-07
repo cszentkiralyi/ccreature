@@ -1,5 +1,3 @@
-import Card from '../lib/card.js';
-
 class CardCollection {
   _cardsByHash = {};
   _countByHash = {};

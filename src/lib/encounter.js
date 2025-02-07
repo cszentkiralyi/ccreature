@@ -154,9 +154,10 @@ class Encounter {
   _player;
   _enemy;
 
-  constructor({ player, enemy, animate, redraw }) {
+  constructor({ player, enemy, end, animate, redraw }) {
     this.redraw = redraw;
     this.animate = animate;
+    this.end = end;
 
     this.entities = {
       player: new EncounterEntity({
@@ -198,7 +199,9 @@ class Encounter {
 
   handleGameState(state) {
     if (this.entities.player.life == 0 || this.entities.enemy.life == 0) {
-      this.gameLoop.setState(this.entities.enemy.life == 0 ? ES.PLAYER_WIN : ES.PLAYER_LOSE);
+      let playerWin = this.entities.enemy.life == 0;
+      this.gameLoop.setState(playerWin ? ES.PLAYER_WIN : ES.PLAYER_LOSE);
+      this.end[playerWin ? 'win' : 'lose']();
       return;
     }
 

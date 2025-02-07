@@ -16,7 +16,6 @@ class EncounterScreen {
 
   view({ attrs }) {
     let encounter = attrs.encounter;
-    console.log('render', Constants.ENCOUNTER_STATE.byVal[encounter.gameState]);
     let handGlow = null;
     if (encounter.canPlay) {
       handGlow = 'glow-blue';

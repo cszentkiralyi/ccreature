@@ -1,5 +1,5 @@
 import Constants from '../lib/constants.js';
-import Util from '../lib/constants.js';
+import Util from '../lib/util.js';
 import Card from '../lib/card.js';
 
 const ENEMY_KIND = Constants.gen_enum([ 'RABBLE', 'ELITE', 'BOSS' ]);
@@ -15,9 +15,13 @@ class EnemyArchetype {
   };
 
   // TODO: replace with scaling algo
-  _levelBonus = {
+  _scaling = {
     resource: { life: 1, mana: 1 }
-  }
+  };
+
+  _loot = [
+    { cards: 0, weight: 1 }
+  ];
 
   constructor(level) {
     this.level = level;
@@ -25,11 +29,17 @@ class EnemyArchetype {
 
   takeTurn({ hand, life, mana, gameEvent }) { gameEvent('pass'); }
 
+  getLoot(bonus) {
+    // TODO: care about the loot bonus, for now it's a placeholder
+    let roll = Util.wrng(this._loot);
+    return Util.genArray(roll.cards, () => Card.generate());
+  }
+
   get life() {
-    return this._base.resource.life + Math.floor(this.level * this._levelBonus.resource.life);
+    return this._base.resource.life + Math.floor(this.level * this._scaling.resource.life);
   }
   get mana() {
-    return this._base.resource.mana + Math.floor(this.level * this._levelBonus.resource.mana);
+    return this._base.resource.mana + Math.floor(this.level * this._scaling.resource.mana);
   }
 
   static create(kind, level) {
@@ -53,6 +63,17 @@ class EnemyArchetype {
 }
 
 class EnemyRabble extends EnemyArchetype {
+  _base = {
+    resource: { life: 1, mana: 1 }
+  };
+
+  _loot = [
+    { cards: 0, weight: 10 },
+    { cards: 1, weight: 10 },
+    { cards: 2, weight: 5 },
+    { cards: 3, weight: 1 }
+  ];
+
   constructor(level) {
     super(level);
 

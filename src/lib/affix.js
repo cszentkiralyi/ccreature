@@ -6,20 +6,15 @@ const DMG = Constants.DAMAGE_TYPE;
 const RES = Constants.RESOURCE;
 
 class Affix {
-  base;
   titles;
   position;
   action;
   magnitude;
   spec;
 
-  constructor(position, titles, { action, magnitude, spec }) {
-    if (typeof AA.byVal[action] === 'undefined') throw `Illegal action value '${action}'`;
-    this.position = position;
-    this.titles = titles;
-    this.action = action;
-    this.magnitude = magnitude;
-    this.spec = spec;
+  constructor(props) {
+    if (typeof AA.byVal[props.action] === 'undefined') throw `Illegal action value '${props.action}'`;
+    Object.assign(this, props);
   }
 
   toString() {

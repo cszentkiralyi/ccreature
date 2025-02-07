@@ -1,5 +1,6 @@
 import m from 'mithril';
 
+import Constants from './lib/constants.js';
 import Util from './lib/util.js';
 import Card from './lib/card.js';
 import Encounter from './lib/encounter.js';
@@ -45,6 +46,18 @@ class App {
       this._encounter = this._encounter || new Encounter({
         player: PROFILE,
         enemy: ENEMY,
+        end: {
+          win: () => {
+            let loot = ENEMY.getLoot();
+            PROFILE.collection.addCards(loot.map(c => ({ card: c, count: 1 })))
+            this._encounter = null;
+            m.route.set('/lab');
+          },
+          lose: () => {
+            this._encounter = null;
+            m.route.set('/lab');
+          }
+        },
         redraw: () => m.redraw()
       });
       return (<EncounterScreen encounter={this._encounter} />);
