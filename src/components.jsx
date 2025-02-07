@@ -3,9 +3,9 @@ import m from 'mithril';
 import Util from './lib/util.js';
 import Card from './lib/card.js';
 import Encounter from './lib/encounter.js';
+import Profile from './lib/profile.js';
 import Archetypes from './data/archetypes.js';
 import Enemies from './data/enemies.js';
-import Profile from './data/profile.js';
 
 import EncounterScreen from './views/encounter.jsx';
 import LabScreen from './views/lab.jsx';
@@ -50,6 +50,8 @@ class App {
       return (<EncounterScreen encounter={this._encounter} />);
     } else if (route.startsWith('/lab')) {
       return (<LabScreen player={PROFILE} />);
+    } else if (route.startsWith('/dev-tools')) {
+      return (<DevToolsScreen player={PROFILE} />);
     }
   }
 }
@@ -69,6 +71,12 @@ class NavigationBar {
     return route.startsWith(path)
       ? <strong>{display}</strong>
       : <m.route.Link href={path}>{display}</m.route.Link>
+  }
+}
+
+class DevToolsScreen {
+  view({ attrs }) {
+    return (<div>Not implemented</div>);
   }
 }
 

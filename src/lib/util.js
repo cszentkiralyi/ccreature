@@ -47,9 +47,6 @@ const wrng = (opts) => {
   }
 };
 
-/** Interpolates the range [a, b] to the point t in [0, 1] */
-const interp = (a, b, t) => a + (t * (b - a));
-
 const identity = (x) => x;
 
 const groupBy = (coll, f) => {
@@ -71,14 +68,37 @@ const genArray = (c, f) => {
   return ret;
 };
 
+
+/** Interpolates the range [a, b] to the point t in [0, 1] */
+/** Interpolates a value across a range : x [a, b] -> y [a, b] */
+const interp = (a, b, t) => a + (t * (b - a));
+
+/** Sigmoid function, like a fancy 'f' : x -> y (-inf, limit)
+ * - steepness "shrinks" the x values the vertical portion occurs in
+ * - midpoint is an x
+ * - scale stretches/shrinks the entire function
+ */
+const sigmoid = (limit, steepness, midpoint, x, scale) => {
+  scale = scale || 1;
+  return s * limit / (1 + Math.pow(Math.E, (-steepness * (x - midpoint))));
+}
+
+const square = (x, intercept, steepness) => {
+  intercept = intercept || 1;
+  steepness = steepness || 1;
+  return Math.pow(steepness * x / intercept, 2);
+}
+
 export default {
   captialize,
   shuffle,
   clamp,
   rng,
   wrng,
-  interp,
   identity,
   groupBy,
-  genArray
+  genArray,
+  interp,
+  sigmoid,
+  square
  };

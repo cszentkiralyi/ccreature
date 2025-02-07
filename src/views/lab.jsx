@@ -4,7 +4,7 @@ import Constants from '../lib/constants.js';
 import Util from '../lib/util.js';
 
 import Card from './card.jsx';
-import Profile from '../data/profile.js';
+import Profile from '../lib/profile.js';
 
 const VIEWS = Constants.gen_enum(['COLLECTION', 'DECKS']);
 

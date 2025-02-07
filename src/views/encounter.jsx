@@ -16,6 +16,13 @@ class EncounterScreen {
 
   view({ attrs }) {
     let encounter = attrs.encounter;
+    console.log('render', Constants.ENCOUNTER_STATE.byVal[encounter.gameState]);
+    let handGlow = null;
+    if (encounter.canPlay) {
+      handGlow = 'glow-blue';
+    } else if (encounter.canDiscard) {
+      handGlow = 'glow-red';
+    }
     let onHandSelect = null;
     if (encounter.canPlay) {
       onHandSelect = (card) => {
@@ -50,6 +57,9 @@ class EncounterScreen {
           <EncounterCardPile count={encounter.entities.player.deck.count('draw')}
             onclick={() => encounter.gameEvent('player-draw-card')}
           />
+          <div class="my-4 text-center">
+            <button onclick={() => encounter.gameEvent('player-pass')}>Pass</button>
+          </div>
         </div>
 
         <div class="">
@@ -61,7 +71,7 @@ class EncounterScreen {
           <EncounterHand
             hand={encounter.entities.player.hand}
             onselect={onHandSelect}
-            glow={encounter.canPlay ? 'glow-blue' : encounter.canDiscard ? 'glow-red' : null}
+            glow={handGlow}
           />
         </div>
         <div class="">

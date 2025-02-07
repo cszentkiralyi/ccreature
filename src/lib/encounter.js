@@ -1,5 +1,6 @@
 import Constants from './constants.js';
 import Util from './util.js';
+import Rules from '../data/rules.js';
 
 const ES = Constants.ENCOUNTER_STATE;
 const AA = Constants.AFFIX_ACTION;
@@ -133,7 +134,7 @@ class EncounterEntity {
     this.debuffs[k] = (this.debuffs[k] || 0) + n;
   }
 
-  applyDamage(magnitude, damage) {
+  applyDamage(magnitude, type) {
     this.life -= magnitude;
   }
 
@@ -276,6 +277,13 @@ class Encounter {
           if (this.gameState == ES.PLAYER_DISCARD && !force) this.nextGameState();
         }
         break;
+      case 'player-pass':
+        // TODO: doesn't support passing queued plays
+        if (this.gameState == ES.PLAYER_PLAY || force) {
+          this.gameLoop.cycleIndex = this.gameLoop.stateCycle.indexOf(ES.ENEMY_TURN);
+          this.nextGameState();
+        }
+        break;
 
       case 'enemy-draw-card':
         if (this.gameState == ES.ENEMY_DRAW || force) {
@@ -335,11 +343,11 @@ class Encounter {
         switch (affix.action) {
           case AA.ATTACK:
             target = (source == CS.PLAYER) ? this.entities.enemy : this.entities.player;
-            target.applyDamage(affix.magnitude, affix.data.damage);
+            target.applyDamage(affix.magnitude, affix.spec.type);
             break;
           case AA.RESTORE:
             target = (source == CS.PLAYER) ? this.entities.player : this.entities.enemy;
-            target.applyRestore(affix.magnitude, affix.data.resource);
+            target.applyRestore(affix.magnitude, affix.spec.resource);
             break;
           case AA.DRAW:
             target = (source == CS.PLAYER) ? this.entities.player : this.entities.enemy;
@@ -356,7 +364,9 @@ class Encounter {
   }
 
   beginEncounter() {
-    for (var i = 0; i < 3; i++) {
+    // -1 is because we'll draw at the start of the first turn anyway
+    let initial = Rules.STARTING_HAND_SIZE - 1;
+    for (var i = 0; i < initial; i++) {
       this.entities.player.drawCard();
     }
   }

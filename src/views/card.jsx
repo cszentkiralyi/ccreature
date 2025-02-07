@@ -62,7 +62,7 @@ class Card {
         {' '}
         {[
           affix.magnitude,
-          Affix.actionDataString(affix.action, affix.data)
+          Affix.actionString(affix.action, affix.spec)
         ].filter(s => s != null).join(' ')
         }
       </span>

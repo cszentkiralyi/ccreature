@@ -11,49 +11,49 @@ class Affix {
   position;
   action;
   magnitude;
-  data;
+  spec;
 
-  constructor(position, titles, { action, magnitude, data }) {
+  constructor(position, titles, { action, magnitude, spec }) {
     if (typeof AA.byVal[action] === 'undefined') throw `Illegal action value '${action}'`;
     this.position = position;
     this.titles = titles;
     this.action = action;
     this.magnitude = magnitude;
-    this.data = data;
+    this.spec = spec;
   }
 
   toString() {
     return [
       Util.captialize(AA.byVal[this.action]),
       this.magnitude,
-      Affix.actionDataString(this.action, this.data)
+      Affix.actionString(this.action, this.spec)
     ].filter(s => s != null).join(' ');
   }
 
-  static actionDataString(action, data) {
+  static actionString(action, spec) {
     switch (action) {
       case AA.ATTACK:
-        return Util.captialize(DMG.byVal[data.damage]);
+        return Util.captialize(DMG.byVal[spec.type]);
       case AA.RESTORE:
-        return Util.captialize(RES.byVal[data.resource]);
+        return Util.captialize(RES.byVal[spec.resource]);
     }
   }
 
   static parse(s) {
     let tokens = s.split(' ');
     let [actionStr, magnitude, ...misc] = tokens;
-    let data = null;
+    let spec = null;
     let action = AA[actionStr.toUpperCase()];
     if (magnitude) magnitude = parseInt(magnitude, 10);
-    if (misc.length > 0) data = this.parseActionData(action, misc);
-    return { action, magnitude, data };
+    if (misc.length > 0) spec = this.parseActionSpec(action, misc);
+    return { action, magnitude, spec };
   }
 
-  static parseActionData(action, misc) {
+  static parseActionSpec(action, misc) {
     switch (action) {
       case AA.ATTACK:
         return {
-          damage: DMG[misc[0].toUpperCase()]
+          type: DMG[misc[0].toUpperCase()]
         }
       case AA.RESTORE:
         return {
