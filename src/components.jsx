@@ -13,7 +13,6 @@ import LabScreen from './views/lab.jsx';
 
 const PLAYER = new Archetypes.TheMeat();
 const PROFILE = new Profile(PLAYER);
-const ENEMY = Enemies.EnemyArchetype.create(Enemies.ENEMY_KIND.RABBLE, 1);
 
 class App {
   route;
@@ -58,12 +57,13 @@ class App {
   }
 
   startEncounter() {
+    let enemy = Enemies.EnemyArchetype.create(Enemies.ENEMY_KIND.RABBLE, 1);
     this._encounter = new Encounter({
       player: PROFILE,
-      enemy: ENEMY,
+      enemy: enemy,
       end: {
         win: () => {
-          let loot = ENEMY.getLoot(1, true);
+          let loot = enemy.getLoot(1);
           PROFILE.collection.addCards(loot.map(c => ({ card: c, count: 1 })))
         },
         lose: () => {

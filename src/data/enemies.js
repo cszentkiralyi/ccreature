@@ -30,10 +30,10 @@ class EnemyArchetype {
   takeTurn({ hand, life, mana, gameEvent }) { gameEvent('pass'); }
 
   getLoot(bonus, force) {
-    if (this._loot && !force) return this.loot;
+    if (this._loot && !force) return this._loot;
     // TODO: care about the loot bonus, for now it's a placeholder
     let roll = Util.wrng(this._lootTable);
-    this._loot = Util.genArray(roll.cards, () => Card.generate());
+    this._loot = Util.genArray(roll.cards, () => Card.generate(this.level));
     return this._loot
   }
 

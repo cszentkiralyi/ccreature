@@ -135,7 +135,7 @@ class Card {
     }
   }
 
-  static generate() {
+  static generate(level) {
     let rarity = Util.wrng([
       { value: R.COMMON, weight: 100 },
       { value: R.MAGIC, weight: 50 },
@@ -159,6 +159,7 @@ class Card {
     let card = new Card({ rarity: rarity }), i;
     for (i = 0; i < affixCount; i++) {
       let affixFilter = {
+        level: (l) => l <= level,
         inst: card.affixes,
         group: card.groups
       };
@@ -168,7 +169,11 @@ class Card {
         affixFilter.position = [AP.PREFIX];
       }
       let affixData = AffixGen.generateAffixExcluding(affixFilter);
-      card.addAffix(new Affix(affixData));
+      if (affixData) {
+        card.addAffix(new Affix(affixData));
+      } else {
+        i = affixCount; // Can't generate any more
+      }
     }
 
     card.mana = 1;

@@ -2,20 +2,21 @@ import m from 'mithril';
 
 import Util from '../lib/util.js';
 import Constants from '../lib/constants.js';
+import Queue from '../lib/queue.js';
 
 import Card from './card.jsx';
 import Animation from './animation.jsx';
 
 class EncounterScreen {
   animations = {};
-  animationQueue = {};
+  overlays = new Queue();
 
   oninit({ attrs }) {
     attrs.encounter.animate = (...args) => this.animate(...args);
   }
 
   view({ attrs }) {
-    let encounter = attrs.encounter;
+    let encounter = this.encounter = attrs.encounter;
     let handGlow = null;
     if (encounter.canPlay) {
       handGlow = 'glow-blue';
@@ -89,18 +90,20 @@ class EncounterScreen {
     return (
       <div>
           {
-            a['play-card']
-            ? (<Animation animation={a['play-card'].source == 'player'
-                  ? 'play-card-north' : 'play-card-south'}
+            a['play-card'] && a['play-card'].current
+            ? (<Animation animation={
+                  a['play-card'].current.source == 'player'
+                  ? 'play-card-north' : 'play-card-south'
+                }
                 duration="1.2s"
                 style={{ left: '45%', zIndex: 999 }}
                 onend={() => this.endAnimation('play-card')}>
-                <Card card={a['play-card'].card} />
+                <Card card={a['play-card'].current.card} />
               </Animation>)
             : null
           }
           {
-            this.animations['draw-card']
+            a['draw-card'] && a['draw-card'].current
             ? (<Animation animation='player-draw-card'
                 duration="0.25s" style={{ zIndex: 999 }}
                 onend={() => this.endAnimation('draw-card')}>
@@ -115,7 +118,8 @@ class EncounterScreen {
   renderOverlay() {
     let overlayWidth = 40; // rem
     let overlayHeight = 20
-    if (!this.overlay) return;
+    if (!this.overlays.current) return;
+    let o = this.overlays.current;
     return (
       <div class="absolute inset-0">
         <div class="relative h-full w-full">
@@ -128,10 +132,10 @@ class EncounterScreen {
              left: `calc(50% - ${(overlayWidth / 2).toFixed(2)}rem)`,
              zIndex: 999
            }}>
-            <div style={{ paddingBottom: '4rem' }}>{this.overlay.message}</div>
+            <div style={{ paddingBottom: '4rem' }}>{o.message}</div>
             <div class="flex items-center">
-              <button onclick={this.overlay.perform}>
-                {this.overlay.action}
+              <button onclick={o.action}>
+                {o.button}
               </button>
             </div>
            </div>
@@ -153,42 +157,50 @@ class EncounterScreen {
         break;
       case 'player-win':
       case 'player-lose':
-        this.overlay = {
-          message: (event === 'player-win') ? 'Win.' : 'Lose.',
-          action: 'to the lab',
-          perform: () => m.route.set('/lab')
-        };
+        let screens = [];
+        let win = event === 'player-win';
+        let loot = win
+          ? this.encounter.trueEnemy.getLoot(this.encounter.entities.player.level)
+          : null;
+        if (win && loot && loot.length > 0) {
+          screens.push({
+            message: `Received ${loot.length} cards.`,
+            button: 'neat',
+            action: () => null
+          });
+        }
+        screens.push({
+          message: win ? 'Win.' : 'Lose.',
+          button: 'to the lab',
+          action: () => null
+        });
+        let a = screens[0].action;
+        screens[0].action = () => { a(); m.route.set('/lab'); }
+        screens.reverse().forEach(screen => this.queueOverlay(screen));
         break;
     }
   }
 
-  startAnimation(anim, data) {
-    this.animations[anim] = data;
-    m.redraw();
-  }
-
   queueAnimation(anim, data) {
     if (!this.animations[anim]) {
-      this.startAnimation(anim, data);
+      this.animations[anim] = new Queue(data);
       m.redraw();
     } else {
-      let q = this.animationQueue[anim] || [];
-      q.push(data);
-      this.animationQueue[anim] = q;
+      this.animations[anim].push(data);
     }
   }
-
   endAnimation(anim) {
-    let queue = this.animationQueue[anim] || [];
     if (!this.animations[anim]) throw `Can't stop non-running animation '${anim}'`;
-    delete this.animations[anim];
-    if (queue && queue.length > 0) {
-      let next = queue[0];
-      queue = queue.slice(1, queue.length - 1);
-      setTimeout(() => this.startAnimation(anim, next), 200);
-    }
-    this.animationQueue[anim] = queue;
-    m.redraw();
+    setTimeout(() => this.animations[anim].next() || m.redraw());
+  }
+
+  queueOverlay(data) {
+    let action = data.action;
+    data.action = () => {
+      action();
+      this.overlays.next();
+    };
+    this.overlays.push(data);
   }
 }
 

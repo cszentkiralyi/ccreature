@@ -106,5 +106,6 @@ export default {
   genArray,
   interp,
   sigmoid,
-  square
+  square,
+  cube
  };

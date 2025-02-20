@@ -91,8 +91,7 @@ class EncounterDeck {
 }
 
 class EncounterEntity {
-  // [current, max]
-  _resources = { [RES.LIFE]: [0, 0], [RES.MANA]: [0, 0] };
+  _resources = { [RES.LIFE]: { current: 0, max: 0 }, [RES.MANA]: { current: 0, max: 0 } };
   deck;
   hand;
   gear;
@@ -106,13 +105,13 @@ class EncounterEntity {
     this.debuffs = { stun: 0 }
   }
 
-  get life() { return this._resources[RES.LIFE][0] }
-  get maxLife() { return this._resources[RES.LIFE][1] }
-  set life(v) { this._resources[RES.LIFE][0] = Util.clamp(v, 0, this.maxLife); }
+  get life() { return this._resources[RES.LIFE].current }
+  get maxLife() { return this._resources[RES.LIFE].max }
+  set life(v) { this._resources[RES.LIFE].current = Util.clamp(v, 0, this.maxLife); }
 
-  get mana() { return this._resources[RES.MANA][0] }
-  get maxMana() { return this._resources[RES.MANA][1] }
-  set mana(v) { this._resources[RES.MANA][0] = Util.clamp(v, 0, this.maxMana); }
+  get mana() { return this._resources[RES.MANA].current }
+  get maxMana() { return this._resources[RES.MANA].max }
+  set mana(v) { this._resources[RES.MANA].current = Util.clamp(v, 0, this.maxMana); }
 
   get speed() { return 1; }
 
@@ -139,10 +138,10 @@ class EncounterEntity {
   }
 
   applyRestore(magnitude, resource) {
-    this._resources[resource][0] = Util.clamp(
-      this._resources[resource][0] + magnitude,
+    this._resources[resource].current = Util.clamp(
+      this._resources[resource].max + magnitude,
       0,
-      this._resources[resource][1]
+      this._resources[resource].max
     );
   }
 }
@@ -163,14 +162,14 @@ class Encounter {
       player: new EncounterEntity({
          cards: player.deck || [],
          resources: {
-           [RES.LIFE]: [player.life, player.life],
-           [RES.MANA]: [player.mana, player.life]
+           [RES.LIFE]: { current: player.life, max: player.life },
+           [RES.MANA]: { current: player.mana, max: player.life }
         }}),
       enemy: new EncounterEntity({
          cards: enemy.deck || [],
          resources: {
-           [RES.LIFE]: [enemy.life, enemy.life],
-           [RES.MANA]: [enemy.mana, enemy.mana]
+           [RES.LIFE]: { current: enemy.life, max: enemy.life },
+           [RES.MANA]: { current: enemy.mana, max: enemy.life }
         }
       }),
     }
@@ -192,6 +191,9 @@ class Encounter {
     this.gameLoop.nextState(); // BEGIN
     this.gameLoop.nextState(); // Progress to what's next
   }
+
+  get truePlayer() { return this._player; }
+  get trueEnemy() { return this._enemy; }
 
   get gameState() { return this.gameLoop.state; }
   nextGameState() { this.gameLoop.nextState(); }

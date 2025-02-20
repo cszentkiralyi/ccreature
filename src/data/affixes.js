@@ -49,6 +49,7 @@ let ALL_AFFIXES = [
       sortOrder: 1
     },
     scaling: {
+      level: { min: 1, max: 30 },
       mana: { min: 1, max: 20 },
       magnitude: { min: 3, max: 30 },
       weight: { min: 200, max: 10 }
@@ -72,6 +73,7 @@ let ALL_AFFIXES = [
       sortOrder: 2
     },
     scaling: {
+      level: { min: 1, max: 30 },
       mana: { min: 1, max: 20 },
       magnitude: { min: 3, max: 30 },
       weight: { min: 200, max: 10 }
@@ -95,6 +97,7 @@ let ALL_AFFIXES = [
       sortOrder: 3
     },
     scaling: {
+      level: { min: 1, max: 30 },
       mana: { min: 1, max: 20 },
       magnitude: { min: 3, max: 30 },
       weight: { min: 200, max: 10 }
@@ -118,6 +121,7 @@ let ALL_AFFIXES = [
       sortOrder: 4
     },
     scaling: {
+      level: { min: 1, max: 30 },
       mana: { min: 1, max: 20 },
       magnitude: { min: 3, max: 30 },
       weight: { min: 200, max: 10 }
@@ -154,6 +158,7 @@ let ALL_AFFIXES = [
       sortOrder: 700
     },
     scaling: {
+      level: { min: 1, max: 30 },
       magnitude: { min: 3, max: 200 },
       weight: { min: 50, max: 10 }
     },
@@ -175,6 +180,7 @@ let ALL_AFFIXES = [
       sortOrder: 701
     },
     scaling: {
+      level: { min: 1, max: 30 },
       magnitude: { min: 3, max: 200 },
       weight: { min: 50, max: 10 }
     },
@@ -195,6 +201,7 @@ let ALL_AFFIXES = [
       sortOrder: 998
     },
     scaling: {
+      level: { min: 1, max: 30 },
       magnitude: { min: 1, max: 3 },
       weight: { min: 100, max: 50 }
     },
@@ -213,6 +220,7 @@ let ALL_AFFIXES = [
       sortOrder: 997
     },
     scaling: {
+      level: { min: 1, max: 30 },
       magnitude: { min: 1, max: 3 },
       weight: { min: 100, max: 50 }
     },
@@ -226,35 +234,44 @@ let ALL_AFFIXES = [
 ];
 
 export default {
+  /** Generates an affix, respecting weights */
   generateAffix: () => Util.wrng(ALL_AFFIXES),
+  /** Generates an affix, respecting weights and a given filter of
+   * the shape { key: [...vals ], ... } where 'key' is a property of
+   * affixes and vals are the values to exclude or 'inst' for object
+   * equality.
+   */
   generateAffixExcluding: (filt) => {
-    /* filt: { key: [...values], ... }
-     * Weighted generation excluding certain values. Valid keys are:
-     * - Any value on a record (group, weight, etc)
-     * - inst for exact object equality (to exclude specific records by ref)
-     */
-    // TODO: optimize for filt having just one key
     let preds = [], pred, k;
     for (k in filt) {
-      let vs = filt[k], pred;
-      if (vs.length > 0) {
+      pred = null;
+      let vs = filt[k];
+      // `for` will update k in-place, making all preds wrong except
+      // the last & 'inst'
+      let kk = k; 
+      if (vs instanceof Function) {
+        pred = (e) => vs(e[kk]);
+      } else if (vs instanceof Array && vs.length > 0) {
         switch (k) {
           case 'inst':
             pred = (e) => vs.indexOf(e) == -1;
             break;
           default:
-            pred = (e, i) => vs.indexOf(e[k]) == -1;
+            pred = (e) => vs.indexOf(e[k]) == -1;
         }
-        preds.push(pred);
       }
+      if (pred != null) preds.push(pred);
     }
     if (preds.length == 0) {
       return Util.wrng(ALL_AFFIXES);
     } else if (preds.length == 1) {
       pred = preds[0];
     } else {
-      pred = preds.reduce((f, p) => (e) => f(e) && p(e), preds[0], preds.slice(1));
+      pred = preds.reduce((a, b) => (x) => a(x) && b(x));
     }
-    return Util.wrng(ALL_AFFIXES.filter(pred));
+    let filtered = ALL_AFFIXES.filter(pred);
+    return (filtered.length > 0)
+      ? Util.wrng(ALL_AFFIXES.filter(pred))
+      : null;
   }
 };
