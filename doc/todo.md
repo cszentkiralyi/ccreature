@@ -1,59 +1,38 @@
 # TODO
 
-## Big picture
+- [ ] Flesh out enemy tiers
+  - [ ] Elite
+  - [ ] Boss
+- [ ] Encounter system
+  - [ ] Abstraction: generate enemies, load them into encounters, dictate
+        transitions like encounters do
+  - [ ] Subscreens
+    - [ ] Encounter screen for current
+    - [ ] Traversal transition screen 
+    - [ ] Traversal animation
+- [ ] Card view tooltip for Lab & encounter rewards
+- [ ] Card affixes tooltip, just rip off Slay the Spire for now
+- [ ] Profile read/write via JSON (dev panel?)
+- [ ] Lab improvements
+  - [ ] Collection filtering: name, affix action, damage type
+  - [ ] Card view tooltip (above)
+  - [ ] Deck stats/scoring
+- [ ] XP framework
+  - [ ] Area level selection
+  - [ ] Player XP & leveling
+  - [ ] Enemy scaling
+  - [ ] Area level metaprogression
+- [ ] Profile initialization & class selection
 
-- [ ] Design
-- [ ] Interface
-  - [ ] Encounter
-  - [ ] Traversal
-  - [ ] Rewards
-  - [ ] Main navbar
-  - [ ] Stash
-  - [ ] The Lab
-- [ ] Systems
-  - [ ] Enemies
-  - [ ] Crafting
-  - [ ] Card generation
-  - [ ] Loot filter
-  - [ ] Gear
-  - [ ] Quests
-  - [ ] Load/save
+## Long-term
 
-## Known bugs
-
-1. [ ] Autoplay / Autoplay card got generated
-
-## Priority 1
-
-- [ ] Encounter UI
-  - [x] Rendering
-    - [x] Card
-    - [x] Deck
-    - [x] Hand
-    - [x] Discard pile
-    - [x] Play area
-    - [x] Resource globes
-  - [x] Actions
-    - [x] Draw card
-    - [x] Discard card
-    - [x] Play card
-    - [x] Gain/lose resources
-  - [ ] Enemy
-    - [ ] Archetypes
-      - [ ] Base
-      - [ ] Boss
-      - [ ] Elite
-      - [x] Rabble
-    - [x] Draw & play AI
-    - [x] Play animation
-- [ ] Game start
-  - [ ] New game screen
-  - [x] Navigation menu
-    - [x] Play (encounter)
-    - [x] Collection
-
-## Priority 2
-
-- [ ] Card generation
-  - [ ] Basic affix tiering
-  - [x] Weighted RNG algorithm
+- Plan out
+  - Gear system
+  - Area level metaprogression
+- New features
+  - Gear
+  - Local storage save
+  - Flavor
+- Flesh out
+  - UI visual improvements
+  - Actual bosses
