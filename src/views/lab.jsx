@@ -124,11 +124,30 @@ class CardCollectionView {
             </option>
           ))}
         </select>
+        <select onchange={(e) => this.setFilter('tags', e.target.value)}>
+          <option value="">Tags</option>
+          {['attack',
+            'spell',
+            'life',
+            'mana',
+            'physical',
+            'elemental',
+            'dark'].map((tag) => (<option value={tag}>{Util.captialize(tag)}</option>))}
+        </select>
       </div>);
   }
 
   setFilter(cat, v) {
-    this._filters[cat] = (v !== '') ? parseInt(v, 10) : null;
+    let op;
+    switch (cat) {
+      case 'rarity':
+        op = (vv, cur) => (vv !== '') ? parseInt(v, 10) : null;
+        break;
+      case 'tags':
+        op = (vv, cur) => (vv !== '') ? vv : null;
+        break;
+    }
+    this._filters[cat] = op(v, this._filters[cat]);
   }
 
   filterCards(cards) {
@@ -144,7 +163,15 @@ class CardCollectionView {
           ks = k.split('.');
           get = (c) => ks.reduce((o, kk) => o && o[kk] ? o[kk] : null, c);
         }
-        ret = ret.filter((c) => v == get(c.card));
+        switch (k) {
+          case 'rarity':
+            ret = ret.filter(c => v == get(c.card));
+            break;
+          case 'tags':
+            console.log(ret.map(c => get(c.card)));
+            ret = ret.filter(c => get(c.card).some(t => t === v));
+            break;
+        }
       }
     }
     return ret;

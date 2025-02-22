@@ -70,15 +70,15 @@ class TheMeat extends Archetype {
       { count: 8,
         card: Card.parse(`Strike
           Common
-          Attack 3 Physical`) },
+          Attack 3 Physical [attack, physical]`) },
       { count: 2,
         card: Card.parse(`Analyze
           Common
-          Restore 4 Mana`) },
+          Restore 4 Mana [mana]`) },
       { count: 2,
         card: Card.parse(`Train
           Common
-          Restore 2 Life`)}
+          Restore 2 Life [life]`)}
     ];
   }
 }

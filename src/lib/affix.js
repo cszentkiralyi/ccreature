@@ -39,10 +39,20 @@ class Affix {
     let tokens = s.split(' ');
     let [actionStr, magnitude, ...misc] = tokens;
     let spec = null;
+    let tags = [];
     let action = AA[actionStr.toUpperCase()];
     if (magnitude) magnitude = parseInt(magnitude, 10);
-    if (misc.length > 0) spec = this.parseActionSpec(action, misc);
-    return { action, magnitude, spec };
+    if (misc.length > 0) {
+      if (misc.some(s => s.startsWith('['))) {
+        let i = misc.indexOf(misc.find(s => s.startsWith('[')));
+        tags = misc.splice(i, misc.length - i)
+          .join(' ')
+          .replaceAll(/[\[\]]/g, '')
+          .split(/, ?/);
+      }
+      spec = this.parseActionSpec(action, misc);
+    }
+    return { action, magnitude, spec, tags };
   }
 
   static parseActionSpec(action, misc) {

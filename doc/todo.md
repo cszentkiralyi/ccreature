@@ -1,5 +1,12 @@
 # TODO
 
+## Bugs
+
+- With multiple rows in the collection view, deckbuilder tooltips are out of
+  position again
+
+## TODO list
+
 - [x] Card view tooltip for Lab & encounter rewards
 - [ ] Flesh out enemy tiers
   - [ ] Elite
@@ -14,7 +21,7 @@
 - [ ] Card affixes tooltip, just rip off Slay the Spire for now
 - [ ] Profile read/write via JSON (dev panel?)
 - [ ] Lab improvements
-  - [ ] Collection filtering: name, affix action, damage type
+  - [x] Collection filtering: tags, rarity
   - [x] Card view tooltip (above)
   - [ ] Deck stats/scoring
 - [ ] XP framework
