@@ -28,6 +28,7 @@ class Affix {
   static actionString(action, spec) {
     switch (action) {
       case AA.ATTACK:
+      case AA.SPELL:
         return Util.captialize(DMG.byVal[spec.type]);
       case AA.RESTORE:
         return Util.captialize(RES.byVal[spec.resource]);

@@ -6,6 +6,7 @@ import Queue from '../lib/queue.js';
 
 import Card from './card.jsx';
 import Animation from './animation.jsx';
+import Tooltip from './tooltip.jsx';
 
 class EncounterScreen {
   animations = {};
@@ -132,7 +133,9 @@ class EncounterScreen {
              left: `calc(50% - ${(overlayWidth / 2).toFixed(2)}rem)`,
              zIndex: 999
            }}>
-            <div style={{ paddingBottom: '4rem' }}>{o.message}</div>
+            <div class="w-full" style={{ paddingBottom: '4rem' }}>
+              {o.message}
+            </div>
             <div class="flex items-center">
               <button onclick={o.action}>
                 {o.button}
@@ -164,13 +167,28 @@ class EncounterScreen {
           : null;
         if (win && loot && loot.length > 0) {
           screens.push({
-            message: `Received ${loot.length} cards.`,
+            message: (
+              <div class="h-full w-full">
+                <div class="text-center w-full py-8">Rewards</div>
+                <div class="text-left" style={{ paddingLeft: '25%', paddingRight: '25%' }}>
+                  {loot.map((card, i) => {
+                    let tt = (<Card card={card} />);
+                    return (
+                      <Tooltip.SideTooltip key={i} fixed={true} tooltip={tt}
+                        left="calc(100% + 10px)" top={`calc(50% - (${Card.HEIGHT} / 2))`}>
+                        <span class="cursor-pointer">{card.title}</span>
+                      </Tooltip.SideTooltip>
+                    );
+                  })}
+                </div>
+              </div>
+            ),
             button: 'neat',
             action: () => null
           });
         }
         screens.push({
-          message: win ? 'Win.' : 'Lose.',
+          message: (<div class="text-center">{win ? 'Win.' : 'Lose.'}</div>),
           button: 'to the lab',
           action: () => null
         });

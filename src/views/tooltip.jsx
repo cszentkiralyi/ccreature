@@ -1,6 +1,7 @@
 import m from 'mithril';
 import Constants from '../lib/constants.js';
 import Util from '../lib/util.js';
+import DOMUtil from './dom.js';
 
 const TEXT = {
   'AFFIX_ACTION': {
@@ -12,20 +13,25 @@ const TEXT = {
 
 class SideTooltip {
   oncreate(vnode) {
-    if (vnode && vnode.dom) this.setPos(vnode);
+    if (vnode && vnode.dom) {
+      if (!vnode.attrs.fixed) this.setPos(vnode);
+      vnode.dom.querySelector('.absolute.inset-0').classList.add('hidden');
+    }
   }
 
   onupdate(vnode) {
-    this.setPos(vnode);
+    if (!vnode.attrs.fixed) this.setPos(vnode);
   }
 
   view({ attrs, children }) {
+    let top = attrs.fixed ? attrs.top : this.top + 'px';
+    let left = attrs.fixed ? attrs.left : this.left + 'px';
     return (
       <div class="group">
         <div class="absolute inset-0 pointer-events-none group-hover:visible">
           <div class="relative w-full h-full pointer-events-none">
             <div class="absolute inline pointer-events-auto side-tooltip-content"
-              style={{ top: `${this.top}px`, left: `${this.left}px` }}>
+              style={{ top, left }}>
               {attrs.tooltip}
             </div>
           </div>
@@ -50,15 +56,15 @@ class SideTooltip {
     } else {
       nextLeft = Math.floor(contentBox.left + contentBox.width + attrs.gap);
     }
-    nextLeft = Util.clamp(nextLeft, 0, window.innerHeight - tipBox.width);
+    nextLeft = Util.clamp(nextLeft, 0, window.innerWidth - tipBox.width);
 
-    console.log({ contentTop: contentBox.top, contentLeft: contentBox.left, nextTop, nextLeft });
     if (nextLeft != this.left || nextTop != this.top) {
-      this.left = nextLeft;
-      this.top = nextTop;
-      tt.style.left = nextLeft + 'px';
-      tt.style.top = nextTop + 'px';
-      dom.querySelector('.absolute.inset-0').classList.add('hidden');
+      let correct = DOMUtil.poscorrect(dom, { left: nextLeft, top: nextTop });
+      this.left = correct.left;
+      this.top = correct.top;
+      tt.style.left = this.left + 'px';
+      tt.style.top = this.top + 'px';
+      dom.querySelector('.absolute.inset-0');
     }
 
     return false;
