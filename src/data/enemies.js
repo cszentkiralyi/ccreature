@@ -66,7 +66,7 @@ class EnemyArchetype {
 
 class EnemyRabble extends EnemyArchetype {
   _base = {
-    resource: { life: 1, mana: 1 }
+    resource: { life: 5, mana: 10 }
   };
 
   _lootTable = [
