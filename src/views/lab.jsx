@@ -53,7 +53,7 @@ class LabScreen {
       case VIEWS.PLAY:
         return (<PlayView start={attrs.startEncounter} continue={attrs.continueEncounter} />);
       case VIEWS.COLLECTION:
-        return (<CardCollectionView cards={attrs.player.collection.cards} />);
+        return (<CardCollectionView cards={attrs.player.collection.cards} filter={true} />);
       case VIEWS.DECKS:
         return (<DeckEditorView player={attrs.player} />);
       default:
@@ -83,18 +83,21 @@ class PlayView {
 
 class CardCollectionView {
   static CARDS_PER_COL = 5;
+  _filters = {};
 
-  view({ attrs }) {
+  view(vnode) {
+    let { attrs } = vnode;
     let cards = attrs.cards;
     let cardclick = attrs.oncardclick || ((c) => null);
     return (
-      <div class="h-full w-full overflow-auto">
-        <div class="grid gap-x-2 gap-y-8"
+      <div class="h-full w-full">
+        {this.renderFilters(vnode)}
+        <div class="grid gap-x-2 gap-y-8 overflow-auto"
           style={{
              gridTemplateColumns: `repeat(${attrs.columns || CardCollectionView.CARDS_PER_COL}, 1fr)`,
              gridAutoFlow: 'row'
           }}>
-          {cards.map(({ card, count }) => (
+          {this.filterCards(cards).map(({ card, count }) => (
             <div class="w-full h-full flex items-center justify-center">
               <div class="flex-col gap-y-2 cursor-pointer">
                 <Card card={card} onclick={() => cardclick(card)} />
@@ -105,6 +108,46 @@ class CardCollectionView {
         </div>
       </div>
     );
+  }
+
+  renderFilters(vnode) {
+    if (!vnode.attrs.filter) return null;
+
+    // TODO: filter by tags
+    return (
+      <div class="w-full flex py-2 border-b border-color-card">
+        <select onchange={(e) => this.setFilter('rarity', e.target.value)}>
+          <option value="">Rarity</option>
+          {Object.keys(Constants.RARITY).map((r) => (
+            <option value={Constants.RARITY[r]}>
+              {Util.captialize(r)}
+            </option>
+          ))}
+        </select>
+      </div>);
+  }
+
+  setFilter(cat, v) {
+    this._filters[cat] = (v !== '') ? parseInt(v, 10) : null;
+  }
+
+  filterCards(cards) {
+    if (Object.values(this._filters).every(v => v == null))
+      return cards;
+    let ret = [...cards], v, get, k, ks;
+    for (k in this._filters) {
+      v = this._filters[k];
+      if (v != null) {
+        if (k.indexOf('.') == -1) {
+          get = (c) => c[k];
+        } else {
+          ks = k.split('.');
+          get = (c) => ks.reduce((o, kk) => o && o[kk] ? o[kk] : null, c);
+        }
+        ret = ret.filter((c) => v == get(c.card));
+      }
+    }
+    return ret;
   }
 }
 
