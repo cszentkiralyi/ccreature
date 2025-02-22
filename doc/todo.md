@@ -18,7 +18,6 @@
     - [ ] Encounter screen for current
     - [ ] Traversal transition screen 
     - [ ] Traversal animation
-- [ ] Card affixes tooltip, just rip off Slay the Spire for now
 - [ ] Profile read/write via JSON (dev panel?)
 - [ ] Lab improvements
   - [x] Collection filtering: tags, rarity
@@ -30,6 +29,7 @@
   - [ ] Enemy scaling
   - [ ] Area level metaprogression
 - [ ] Profile initialization & class selection
+- [ ] Card affixes tooltip, just rip off Slay the Spire for now
 
 ## Long-term
 
