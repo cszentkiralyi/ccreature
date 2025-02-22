@@ -15,6 +15,7 @@ class GameLoop {
   stateQueue;
   cycleIndex = 0;
   handleState;
+  _skipnext = [];
 
   constructor(cycle, initial, handle) {
     this.stateCycle = cycle;
@@ -23,16 +24,25 @@ class GameLoop {
   }
 
   nextState() {
-    let q = this.stateQueue.length;
+    let q = this.stateQueue.length, next;
     if (q > 1) {
-      this.state = this.stateQueue[0];
+      next = this.stateQueue[0]
+      if (!this.validateState(next))
+        return this.nextState();
+      this.state = next;
       this.stateQueue = this.stateQueue.slice(1, q);
     } else if (q == 1) {
-      this.state = this.stateQueue.pop();
+      next = this.stateQueue.pop();
+      if (!this.validateState(next))
+        return this.nextState();
+      this.state = next;
     } else {
-      this.state = this.stateCycle[this.cycleIndex++];
+      let next = this.stateCycle[this.cycleIndex++];
       if (this.cycleIndex > this.stateCycle.length - 1)
         this.cycleIndex = 0;
+      if (!this.validateState(next))
+        return this.nextState();
+      this.state = next;
     }
     this.handleState(this.state);
   }
@@ -40,6 +50,17 @@ class GameLoop {
   queueState(s) { this.stateQueue.push(s); }
 
   setState(s) { this.state = s; }
+
+  skipState(s) { this._skipnext.push(s); }
+
+  validateState(s) {
+    let i = this._skipnext.indexOf(s);
+    if (i > -1) {
+      this._skipnext.splice(i, 1);
+      return false;
+    }
+    return true;
+  }
 }
 
 class EncounterDeck {
@@ -356,6 +377,9 @@ class Encounter {
               this.gameLoop.queueState((source == CS.PLAYER) ? ES.PLAYER_DISCARD : ES.ENEMY_DISCARD);
             }
             break;
+          case AA.STUN:
+            let turn = (source == CS.PLAYER) ? ES.ENEMY_PLAY : ES.PLAYER_PLAY;
+            target = (source == CS.PLAYER) ? this.entities.enemy : this.entities.player;
         }
       });
     }

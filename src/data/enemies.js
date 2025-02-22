@@ -103,6 +103,17 @@ class EnemyRabble extends EnemyArchetype {
 class EnemyElite extends EnemyArchetype {
   constructor(level) {
     super(level);
+
+    this.deck = [
+      { count: 8,
+        card: Card.parse(`Fear
+          Common
+          Attack 3 Physical`) },
+      { count: 2,
+        card: Card.parse(`Pain
+          Common
+          Stun 1`) }
+    ];
   }
 }
 
