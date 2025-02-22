@@ -191,7 +191,7 @@ class EncounterScreen {
   }
   endAnimation(anim) {
     if (!this.animations[anim]) throw `Can't stop non-running animation '${anim}'`;
-    setTimeout(() => this.animations[anim].next() || m.redraw());
+    setTimeout(() => { this.animations[anim].next(); m.redraw(); } );
   }
 
   queueOverlay(data) {

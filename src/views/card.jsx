@@ -16,8 +16,8 @@ class Card {
     }
 
     let rarityStr = Constants.RARITY.byVal[attrs.card.rarity].toLowerCase();
-    let onmenter = attrs.onhoverstart || ((e) => null);
-    let onmleave = attrs.onhoverend || ((e) => null);
+    let onmenter = attrs.onhoverstart;
+    let onmleave = attrs.onhoverend;
     return (
       <div class={`grid rounded bg-white border border-color-card ${(attrs.shadow) || 'shadow'} noselect`}
         style={{
@@ -58,7 +58,7 @@ class Card {
   tooltipAffix(affix) {
     return (
       <span>
-        <Tooltip enum='AFFIX_ACTION' value={affix.action} />
+        <Tooltip.Tooltip enum='AFFIX_ACTION' value={affix.action} />
         {' '}
         {[
           affix.magnitude,

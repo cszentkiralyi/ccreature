@@ -1,5 +1,6 @@
 # TODO
 
+- [ ] Card view tooltip for Lab & encounter rewards
 - [ ] Flesh out enemy tiers
   - [ ] Elite
   - [ ] Boss
@@ -10,7 +11,6 @@
     - [ ] Encounter screen for current
     - [ ] Traversal transition screen 
     - [ ] Traversal animation
-- [ ] Card view tooltip for Lab & encounter rewards
 - [ ] Card affixes tooltip, just rip off Slay the Spire for now
 - [ ] Profile read/write via JSON (dev panel?)
 - [ ] Lab improvements

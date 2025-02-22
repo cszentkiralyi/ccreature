@@ -139,7 +139,7 @@ class EncounterEntity {
 
   applyRestore(magnitude, resource) {
     this._resources[resource].current = Util.clamp(
-      this._resources[resource].max + magnitude,
+      this._resources[resource].current + magnitude,
       0,
       this._resources[resource].max
     );

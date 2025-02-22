@@ -2,9 +2,10 @@ import m from 'mithril';
 
 import Constants from '../lib/constants.js';
 import Util from '../lib/util.js';
+import Profile from '../lib/profile.js';
 
 import Card from './card.jsx';
-import Profile from '../lib/profile.js';
+import Tooltip from './tooltip.jsx';
 
 const VIEWS = Constants.gen_enum(['PLAY', 'COLLECTION', 'DECKS']);
 
@@ -125,11 +126,15 @@ class DeckEditorView {
             oncardclick={(c) => this.tryAddCard(c, player.collection)} />
           <div class="border-l border-color-0 grid gap-y-4" style={{ gridTemplateRows: '80% 20%' }}>
             <div class="gap-y-4 overflow-auto">
-              {deck.cards.cards.map(({ card, count }) => {
+              {deck.cards.cards.map(({ card, count }, i) => {
+                let tt = (<Card card={card} />);
                 return (
-                  <div class="cursor-pointer p-2" onclick={() => this.current.cards.removeCard(card)}>
-                    {count}x {card.title}
-                  </div>
+                  <Tooltip.SideTooltip key={i} side="left" gap={10}
+                    tooltip={tt}>
+                    <div class="cursor-pointer p-2" onclick={() => this.current.cards.removeCard(card)}>
+                      {count}x {card.title}
+                    </div>
+                  </Tooltip.SideTooltip>
                 );
               })}
             </div>

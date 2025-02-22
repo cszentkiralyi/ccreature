@@ -206,6 +206,9 @@ body {
 .opacity-100 { opacity: 1; }
 .hover\:opacity-100:hover { opacity: 1; }
 
+.hidden { display: none; }
+.group:hover .group-hover\:visible { display: initial; }
+
 .transition { transition-duration: var(--transition-duration); }
 
 .transition-fast { --transition-duration: 0.15s; }
