@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] Card view tooltip for Lab & encounter rewards
+- [x] Card view tooltip for Lab & encounter rewards
 - [ ] Flesh out enemy tiers
   - [ ] Elite
   - [ ] Boss
@@ -15,7 +15,7 @@
 - [ ] Profile read/write via JSON (dev panel?)
 - [ ] Lab improvements
   - [ ] Collection filtering: name, affix action, damage type
-  - [ ] Card view tooltip (above)
+  - [x] Card view tooltip (above)
   - [ ] Deck stats/scoring
 - [ ] XP framework
   - [ ] Area level selection
